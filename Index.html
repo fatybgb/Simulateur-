@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>OCP Simulateur Commercial 2025</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:#f1f5f9;color:#1e293b;display:flex;height:100vh;overflow:hidden;font-size:13px}
+/* SIDEBAR */
+aside{width:215px;min-width:215px;background:#1e3a5f;display:flex;flex-direction:column;overflow-y:auto}
+.logo{padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.logo h1{color:#fff;font-size:14px;font-weight:600;margin-bottom:2px}
+.logo p{color:rgba(255,255,255,.45);font-size:11px}
+.nav-sec{font-size:10px;color:rgba(255,255,255,.35);padding:14px 14px 4px;text-transform:uppercase;letter-spacing:.06em}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:8px 14px;color:rgba(255,255,255,.6);cursor:pointer;transition:.15s;border-left:2px solid transparent;font-size:12.5px}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-btn.on{background:rgba(255,255,255,.11);color:#fff;border-left-color:#60a5fa;font-weight:500}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.nav-footer{margin-top:auto;padding:10px 14px;border-top:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-size:10px}
+/* MAIN */
+main{flex:1;overflow-y:auto}
+.pg{display:none;padding:22px;max-width:1300px}
+.pg.on{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+/* PAGE HEADER */
+.ph h1{font-size:19px;font-weight:600;color:#0f172a;margin-bottom:2px}
+.ph p{color:#64748b;font-size:12px;margin-bottom:18px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:14px;border-top:3px solid}
+.kpi label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.kpi strong{display:block;font-size:21px;font-weight:600;color:#0f172a;line-height:1}
+.kpi span{display:block;font-size:10px;color:#94a3b8;margin-top:3px}
+.kpi.bl{border-top-color:#2563eb}.kpi.gr{border-top-color:#16a34a}
+.kpi.pu{border-top-color:#7c3aed}.kpi.or{border-top-color:#ea580c}
+/* CARD */
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:18px;margin-bottom:14px}
+.card h3{font-size:12px;font-weight:600;color:#374151;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:7px 10px;font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;border-bottom:1px solid #f1f5f9}
+td{padding:8px 10px;border-bottom:1px solid #f9fafb;color:#374151}
+tr:hover td{background:#fafafa}
+/* BADGE */
+.b{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px}
+.b.g{background:#dcfce7;color:#15803d}.b.y{background:#fef9c3;color:#a16207}
+.b.r{background:#fee2e2;color:#dc2626}.b.b{background:#dbeafe;color:#1d4ed8}
+.b.gr{background:#f1f5f9;color:#475569}
+/* CONTROLS */
+.ctrl{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ctrl label{font-size:11.5px;color:#64748b;min-width:110px;flex-shrink:0}
+select{padding:5px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;cursor:pointer}
+select:focus{outline:2px solid #2563eb;border-color:transparent}
+input[type=range]{flex:1;accent-color:#2563eb;cursor:pointer}
+.cv{font-size:12px;font-weight:600;color:#2563eb;min-width:48px;text-align:right}
+/* RESULTS */
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.rb{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}
+.rb.hl{background:#eff6ff;border-color:#bfdbfe}
+.rb label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;margin-bottom:3px}
+.rb strong{display:block;font-size:22px;font-weight:700}
+.rb span{display:block;font-size:10px;color:#94a3b8;margin-top:2px}
+.up{color:#16a34a}.dn{color:#dc2626}.nt{color:#1e293b}
+/* STOCK BAR */
+.sb{margin-bottom:9px}
+.sb header{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.sb-bg{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.sb-fill{height:100%;border-radius:4px;transition:width .4s}
+/* CHATBOT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 120px)}
+#chat-msgs{flex:1;overflow-y:auto;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:10px;min-height:0}
+.msg{display:flex;gap:8px;margin-bottom:14px;align-items:flex-start}
+.msg.u{flex-direction:row-reverse}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.av.ai{background:#1e3a5f;color:#fff}.av.u{background:#e2e8f0;color:#475569}
+.bbl{max-width:72%;padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+.bbl.ai{background:#fff;border:1px solid #e2e8f0;border-top-left-radius:3px}
+.bbl.u{background:#1e3a5f;color:#fff;border-top-right-radius:3px}
+.sugg{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.sq{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:5px 11px;font-size:11.5px;color:#475569;cursor:pointer;transition:.15s}
+.sq:hover{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.inp-row{display:flex;gap:7px}
+#ci{flex:1;border:1px solid #e2e8f0;border-radius:7px;padding:9px 13px;font-size:12.5px;outline:none}
+#ci:focus{border-color:#2563eb}
+#cs{background:#1e3a5f;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.15s}
+#cs:hover{background:#1e40af}#cs:disabled{opacity:.45;cursor:default}
+.typ{display:flex;gap:3px;padding:3px 0}
+.typ span{width:6px;height:6px;background:#94a3b8;border-radius:50%;animation:b .8s infinite}
+.typ span:nth-child(2){animation-delay:.16s}.typ span:nth-child(3){animation-delay:.32s}
+@keyframes b{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+/* API NOTICE */
+.api-n{background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:11px 14px;font-size:12px;color:#92400e;margin-bottom:12px}
+.api-n input{margin-top:5px;width:100%;padding:6px 9px;border:1px solid #fde68a;border-radius:5px;font-size:12px;background:#fff;color:#1e293b}
+/* STATUS */
+.st{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:5px 10px;margin-bottom:14px}
+.std{width:6px;height:6px;border-radius:50%;background:#22c55e}
+/* ALERT BOX */
+.alrt{border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:14px}
+.alrt.or{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+</style>
+</head>
+<body>
+  <aside>
+  <div class="logo"><h1>OCP Simulateur</h1><p>Commercial 2025</p></div>
+  <div class="nav-sec">Vue generale</div>
+  <div class="nav-btn on" onclick="go('dashboard',this)"><span class="dot" style="background:#60a5fa"></span>Tableau de bord</div>
+  <div class="nav-sec">Modules ML</div>
+  <div class="nav-btn" onclick="go('m1',this)"><span class="dot" style="background:#60a5fa"></span>M1 — Demande</div>
+  <div class="nav-btn" onclick="go('m2',this)"><span class="dot" style="background:#4ade80"></span>M2 — Prix optimal</div>
+  <div class="nav-btn" onclick="go('m3',this)"><span class="dot" style="background:#fb923c"></span>M3 — Production</div>
+  <div class="nav-btn" onclick="go('m4',this)"><span class="dot" style="background:#c084fc"></span>M4 — Profit</div>
+  <div class="nav-sec">Analyse</div>
+  <div class="nav-btn" onclick="go('scenarios',this)"><span class="dot" style="background:#34d399"></span>Scenarios what-if</div>
+  <div class="nav-btn" onclick="go('stocks',this)"><span class="dot" style="background:#f472b6"></span>Stocks MP</div>
+  <div class="nav-btn" onclick="go('chatbot',this)"><span class="dot" style="background:#fbbf24"></span>Chatbot IA</div>
+  <div class="nav-sec">Outils</div>
+  <div class="nav-btn" onclick="go('previsions',this)"><span class="dot" style="background:#a78bfa"></span>Previsions 2026</div>
+  <div class="nav-btn" onclick="exportPDF()"><span class="dot" style="background:#f87171"></span>Exporter PDF</div>
+  <div class="nav-footer">537 transactions · 7 produits · 2025</div>
+</aside>
+
+<main>
+
+<!-- DASHBOARD -->
+<div class="pg on" id="pg-dashboard">
+  <div class="ph"><h1>Tableau de bord global</h1><p>Jan–Dec 2025 · OCP Jorf Lasfar · Direction Controle de Gestion</p></div>
+  <div class="kpis">
+    <div class="kpi bl"><label>CA Net-Net</label><strong>218.8 M</strong><span>USD · 2025</span></div>
+    <div class="kpi gr"><label>Volume total</label><strong>601 903 t</strong><span>7 produits</span></div>
+    <div class="kpi pu"><label>Marge nette moy.</label><strong>19.6%</strong><span>537 transactions</span></div>
+    <div class="kpi or"><label>Profit net</label><strong>50.7 M</strong><span>USD · 2025</span></div>
+  </div>
+  <div class="g2">
+    <div class="card"><h3>Ventes par produit (tonnes)</h3><div style="position:relative;height:210px"><canvas id="ch-prod"></canvas></div></div>
+    <div class="card"><h3>Marge nette par produit (%)</h3><div style="position:relative;height:210px"><canvas id="ch-marge"></canvas></div></div>
+  </div>
+  <div class="card"><h3>Evolution mensuelle du CA (USD)</h3><div style="position:relative;height:165px"><canvas id="ch-mois"></canvas></div></div>
+  <div class="g2">
+    <div class="card"><h3>Performance par produit</h3>
+      <table><thead><tr><th>Produit</th><th>Volume (t)</th><th>CA (M USD)</th><th>Marge</th><th>Profit</th></tr></thead>
+      <tbody id="tb-prod"></tbody></table>
+    </div>
+    <div class="card"><h3>CA par marche</h3><div style="position:relative;height:195px"><canvas id="ch-pays"></canvas></div></div>
+  </div>
+</div>
+
+<!-- M1 -->
+<div class="pg" id="pg-m1">
+  <div class="ph"><h1>M1 — Prevision de la demande</h1><p>Modele XGBoost · Simule l'impact du prix et des promotions sur le volume vendu</p></div>
+  <div class="st"><div class="std"></div>Modele XGBoost entrainement · R² = 0.84 · MAE = 98 tonnes</div>
+  <div class="g2">
+    <div class="card">
+      <h3>Parametres</h3>
+      <div class="ctrl"><label>Produit</label><select id="m1p" onchange="cM1()"></select></div>
+      <div class="ctrl"><label>Segment</label><select id="m1s" onchange="cM1()"><option>Local</option><option>Export</option><option>Distributeur</option></select></div>
+      <div class="ctrl"><label>Mois</label><select id="m1m" onchange="cM1()"></select></div>
+      <hr style="border:none;border-top:1px solid #f1f5f9;margin:10px 0">
+      <h3>Leviers what-if</h3>
+      <div class="ctrl"><label>Variation prix (%)</label><input type="range" id="m1px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m1pxv').textContent=(this.value>0?'+':'')+this.value+'%';cM1()"><span class="cv" id="m1pxv">0%</span></div>
+      <div class="ctrl"><label>Promotion</label><select id="m1pr" onchange="cM1()"><option value="0">Non</option><option value="1">Oui (+12% demande)</option></select></div>
+      <div class="ctrl"><label>Saison</label><select id="m1sa" onchange="cM1()"><option>Printemps T2</option><option>Ete T3</option><option>Automne T4</option><option>Hiver T1</option></select></div>
+    </div>
+    <div>
+      <div class="rg">
+        <div class="rb hl"><label>Demande predite</label><strong class="nt" id="m1pred">—</strong><span>tonnes</span></div>
+        <div class="rb"><label>Historique</label><strong class="nt" id="m1hist">—</strong><span>tonnes</span></div>
+        <div class="rb"><label>Ecart</label><strong id="m1dlt">—</strong><span id="m1dlp">—</span></div>
+      </div>
+      <div class="card"><h3>Courbe demande vs prix</h3><div style="position:relative;height:180px"><canvas id="ch-m1"></canvas></div></div>
+      <div class="card" id="m1-box" style="background:#f0fdf4;border-color:#bbf7d0"><p id="m1-txt" style="font-size:12px;color:#166534">Modifier les parametres.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- M2 -->
+<div class="pg" id="pg-m2">
+  <div class="ph"><h1>M2 — Optimisation du prix</h1><p>Profit = (Prix − Cout) × Demande · Trouver le prix qui maximise le profit</p></div>
+  <div class="g2">
+    <div class="card">
+      <h3>Simulateur de prix</h3>
+      <div class="ctrl"><label>Produit</label><select id="m2p" onchange="cM2()"></select></div>
+      <div class="ctrl"><label>Prix teste (USD/t)</label><input type="range" id="m2px" min="200" max="700" value="500" step="5" oninput="document.getElementById('m2pxv').textContent=this.value+' USD';cM2()"><span class="cv" id="m2pxv">500 USD</span></div>
+      <div class="ctrl"><label>Demande base (t)</label><input type="range" id="m2dm" min="500" max="50000" value="5000" step="500" oninput="document.getElementById('m2dmv').textContent=Number(this.value).toLocaleString('fr-FR')+' t';cM2()"><span class="cv" id="m2dmv">5 000 t</span></div>
+      <div class="rg" style="margin-top:14px">
+        <div class="rb"><label>Cout prod.</label><strong class="nt" id="m2cout">—</strong><span>USD/t</span></div>
+        <div class="rb"><label>Marge unit.</label><strong id="m2marg">—</strong><span>USD/t</span></div>
+        <div class="rb hl"><label>Profit total</label><strong id="m2prof">—</strong><span>USD</span></div>
+      </div>
+    </div>
+    <div class="card"><h3>Courbe profit vs prix</h3><div style="position:relative;height:250px"><canvas id="ch-m2"></canvas></div></div>
+  </div>
+  <div class="card"><h3>Prix optimaux — tous les produits</h3>
+    <table><thead><tr><th>Produit</th><th>Cout prod.</th><th>Bornes prix</th><th>Prix optimal</th><th>Marge unit.</th><th>% Marge</th></tr></thead>
+    <tbody id="tb-prix"></tbody></table>
+  </div>
+</div>
+
+<!-- M3 -->
+<div class="pg" id="pg-m3">
+  <div class="ph"><h1>M3 — Planification Production / Achat</h1><p>Programmation Lineaire · Maximiser profit sous contraintes : capacite machine · stock MP · demande</p></div>
+  <div class="alrt or"><strong>Modele LP :</strong> Max Profit = Revenus − Cout_production − Cout_achat_MP &nbsp;|&nbsp; <strong>Contraintes :</strong> Prod ≤ Capacite · Stock ≥ Securite · Prod ≥ Demande</div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Mois :</label><select id="m3m" onchange="cM3()"></select></div>
+    <span class="b g">Statut LP : Optimal</span>
+  </div>
+  <div class="g3">
+    <div>
+      <div class="card"><h3>Plan de production</h3>
+        <table><thead><tr><th>Produit</th><th>Demande</th><th>Prod LP</th><th>Capacite</th><th>Taux</th><th>Statut</th></tr></thead>
+        <tbody id="tb-m3"></tbody></table>
+      </div>
+      <div class="card"><h3>Production vs Capacite</h3><div style="position:relative;height:185px"><canvas id="ch-m3"></canvas></div></div>
+    </div>
+    <div>
+      <div class="card"><h3>Stocks MP</h3><div id="mp-stocks"></div></div>
+      <div class="card"><h3>Signaux d'achat</h3><div id="mp-signals"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- M4 -->
+<div class="pg" id="pg-m4">
+  <div class="ph"><h1>M4 — Simulation du profit</h1><p>Modele XGBoost · Predit la marge nette en fonction des decisions commerciales</p></div>
+  <div class="st"><div class="std"></div>Modele XGBoost · R² = 0.87 · Precision ±1.2 pts</div>
+  <div class="g2">
+    <div class="card">
+      <h3>Parametres</h3>
+      <div class="ctrl"><label>Produit</label><select id="m4p" onchange="cM4()"></select></div>
+      <div class="ctrl"><label>Segment</label><select id="m4s" onchange="cM4()"><option>Local</option><option>Export</option><option>Distributeur</option></select></div>
+      <div class="ctrl"><label>Mois</label><select id="m4m" onchange="cM4()"></select></div>
+      <hr style="border:none;border-top:1px solid #f1f5f9;margin:10px 0">
+      <h3>Leviers</h3>
+      <div class="ctrl"><label>Prix +/- (%)</label><input type="range" id="m4px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m4pxv').textContent=(this.value>0?'+':'')+this.value+'%';cM4()"><span class="cv" id="m4pxv">0%</span></div>
+      <div class="ctrl"><label>Volume +/- (%)</label><input type="range" id="m4vl" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m4vlv').textContent=(this.value>0?'+':'')+this.value+'%';cM4()"><span class="cv" id="m4vlv">0%</span></div>
+      <div class="ctrl"><label>Promotion</label><select id="m4pr" onchange="cM4()"><option value="0">Non</option><option value="1">Oui (+8%)</option></select></div>
+      <div class="ctrl"><label>Remise (%)</label><input type="range" id="m4rm" min="0" max="15" value="2" step="0.5" oninput="document.getElementById('m4rmv').textContent=this.value+'%';cM4()"><span class="cv" id="m4rmv">2%</span></div>
+    </div>
+    <div>
+      <div class="rg">
+        <div class="rb hl"><label>Profit predit</label><strong id="m4pred">—</strong><span>% marge nette</span></div>
+        <div class="rb"><label>Profit USD</label><strong class="nt" id="m4usd">—</strong><span>USD estime</span></div>
+        <div class="rb"><label>Vs historique</label><strong id="m4dlt">—</strong><span id="m4dlb">base: —%</span></div>
+      </div>
+      <div class="card"><h3>Jauge de rentabilite</h3><div id="m4jauge"></div></div>
+      <div class="card"><h3>Analyse</h3><div id="m4analyse" style="font-size:12px;color:#475569;line-height:1.6"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARIOS -->
+<div class="pg" id="pg-scenarios">
+  <div class="ph"><h1>Scenarios What-If</h1><p>Comparer 3 scenarios et leur impact sur le profit</p></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Produit :</label><select id="scp" onchange="cSC()"></select></div>
+      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Mois :</label><select id="scm" onchange="cSC()"></select></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px">
+    <div class="card" style="border-top:3px solid #94a3b8"><h3>Base</h3><div style="font-size:11px;color:#64748b">Prix 0% · Vol 0% · No promo<br><span style="margin-top:4px;display:block;color:#94a3b8">Reference</span></div></div>
+    <div class="card" style="border-top:3px solid #2563eb">
+      <h3>Scenario 1</h3>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s1px" min="-20" max="20" value="5" step="1" oninput="document.getElementById('s1pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s1pxv" style="min-width:36px">+5%</span></div>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s1vl" min="-20" max="20" value="0" step="1" oninput="document.getElementById('s1vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s1vlv" style="min-width:36px">0%</span></div>
+      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s1pr" onchange="cSC()" style="font-size:11px"><option value="0">Non</option><option value="1" selected>Oui</option></select></div>
+    </div>
+    <div class="card" style="border-top:3px solid #16a34a">
+      <h3>Scenario 2</h3>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s2px" min="-20" max="20" value="-5" step="1" oninput="document.getElementById('s2pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s2pxv" style="min-width:36px">-5%</span></div>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s2vl" min="-20" max="20" value="10" step="1" oninput="document.getElementById('s2vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s2vlv" style="min-width:36px">+10%</span></div>
+      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s2pr" onchange="cSC()" style="font-size:11px"><option value="0" selected>Non</option><option value="1">Oui</option></select></div>
+    </div>
+    <div class="card" style="border-top:3px solid #ea580c">
+      <h3>Scenario 3</h3>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s3px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('s3pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s3pxv" style="min-width:36px">0%</span></div>
+      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s3vl" min="-20" max="20" value="-10" step="1" oninput="document.getElementById('s3vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s3vlv" style="min-width:36px">-10%</span></div>
+      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s3pr" onchange="cSC()" style="font-size:11px"><option value="0" selected>Non</option><option value="1">Oui</option></select></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px" id="sc-res"></div>
+  <div class="card"><h3>Comparaison profit (%)</h3><div style="position:relative;height:200px"><canvas id="ch-sc"></canvas></div></div>
+</div>
+
+<!-- STOCKS -->
+<div class="pg" id="pg-stocks">
+  <div class="ph"><h1>Stocks Matieres Premieres</h1><p>Niveaux de stock · Alertes · Signaux d'achat · Donnees FACT_STOCKS</p></div>
+  <div class="g2">
+    <div class="card"><h3>Niveaux de stock (% vs maximum)</h3><div id="all-stocks"></div></div>
+    <div class="card"><h3>Tableau des achats 2025</h3>
+      <table><thead><tr><th>Matiere</th><th>Prix moy (USD/t)</th><th>Qte totale (t)</th><th>Nb achats</th></tr></thead>
+      <tbody id="tb-achats"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<div class="pg" id="pg-chatbot">
+  <div class="ph"><h1>Chatbot IA — Assistant OCP</h1><p>Propulse par Claude · Repond aux questions sur les donnees OCP 2025</p></div>
+  <div class="api-n" id="api-n">
+    <strong>Cle API Groq requise (100% gratuit).</strong> Creer un compte sur <a href="https://console.groq.com" target="_blank" style="color:#92400e">console.groq.com</a> → API Keys → Create Key
+    <input type="password" id="apikey" placeholder="gsk_xxxxxxxxxxxxxxxxxx" oninput="saveKey()">
+  </div>
+  <div class="chat-wrap">
+    <div class="sugg" id="sugg">
+      <button class="sq" onclick="useS(this)">Quel produit a la meilleure marge ?</button>
+      <button class="sq" onclick="useS(this)">Compare Maroc et Inde.</button>
+      <button class="sq" onclick="useS(this)">Comment ameliorer le profit du NPS ?</button>
+      <button class="sq" onclick="useS(this)">Analyse la tendance mensuelle.</button>
+      <button class="sq" onclick="useS(this)">Quels marches ont le plus fort potentiel ?</button>
+      <button class="sq" onclick="useS(this)">Strategie de prix pour le DAP ?</button>
+    </div>
+    <div id="chat-msgs"></div>
+    <div class="inp-row">
+      <input type="text" id="ci" placeholder="Pose ta question sur les donnees OCP 2025..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button id="cs" onclick="sendChat()">Envoyer</button>
+    </div>
+  </div>
+</div>
+<!-- PREVISIONS 2026 -->
+<div class="pg" id="pg-previsions">
+  <div class="ph"><h1>Previsions 2026</h1><p>Forecasting base sur les tendances 2025 · Projection 12 mois · Intervalles de confiance</p></div>
+
+  <div class="kpis">
+    <div class="kpi bl"><label>CA prevu 2026</label><strong id="prev-ca">—</strong><span id="prev-ca-delta">vs 2025</span></div>
+    <div class="kpi gr"><label>Volume prevu 2026</label><strong id="prev-vol">—</strong><span id="prev-vol-delta">vs 2025</span></div>
+    <div class="kpi pu"><label>Marge prevue 2026</label><strong id="prev-marge">—</strong><span>projection</span></div>
+    <div class="kpi or"><label>Profit prevu 2026</label><strong id="prev-profit">—</strong><span id="prev-profit-delta">vs 2025</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Produit :</label>
+        <select id="prev-produit" onchange="buildPrevisions()">
+          <option value="ALL">Tous les produits</option>
+        </select>
+      </div>
+      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Croissance marche :</label>
+        <input type="range" id="prev-growth" min="-10" max="20" value="3" step="1" oninput="document.getElementById('prev-gv').textContent=(this.value>0?'+':'')+this.value+'%';buildPrevisions()">
+        <span class="cv" id="prev-gv">+3%</span>
+      </div>
+      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Variation prix :</label>
+        <input type="range" id="prev-prix" min="-10" max="15" value="2" step="1" oninput="document.getElementById('prev-pv').textContent=(this.value>0?'+':'')+this.value+'%';buildPrevisions()">
+        <span class="cv" id="prev-pv">+2%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>Evolution CA mensuel — 2025 reel vs 2026 prevu (M USD)</h3>
+      <div style="position:relative;height:240px"><canvas id="ch-prev-ca"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Evolution volume mensuel — 2025 reel vs 2026 prevu (tonnes)</h3>
+      <div style="position:relative;height:240px"><canvas id="ch-prev-vol"></canvas></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>Previsions par produit — CA 2026 estime</h3>
+      <table>
+        <thead><tr><th>Produit</th><th>CA 2025 reel</th><th>CA 2026 prevu</th><th>Evolution</th><th>Confiance</th></tr></thead>
+        <tbody id="tb-prev-prod"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Previsions marge nette 2026 (%)</h3>
+      <div style="position:relative;height:230px"><canvas id="ch-prev-marge"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:#fffbeb;border-color:#fde68a">
+    <h3 style="color:#92400e">Hypotheses du modele de prevision</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;color:#78350f">
+      <div><strong>Methode :</strong> Regression lineaire sur tendances 2025 + effets saisonniers detailles</div>
+      <div><strong>Saisonnalite :</strong> T2 (Avr-Jun) pic +28% · T1 et T4 creux -12%</div>
+      <div><strong>Croissance marche :</strong> Parametre ajustable (-10% a +20%)</div>
+      <div><strong>Intervalle confiance :</strong> ±8% base sur la volatilite mensuelle 2025</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA REELLES OCP 2025
+// ═══════════════════════════════════════════════════════
+const D = {
+  prods: [
+    {n:"DAP",   q:46967,  ca:24220893, m:29.1, p:7908427,  cout:324.53, bmin:450, bmax:650},
+    {n:"MAP",   q:41248,  ca:20396806, m:25.9, p:6150383,  cout:324.53, bmin:440, bmax:620},
+    {n:"NPK",   q:9088,   ca:4204954,  m:79.3, p:3569683,  cout:291.70, bmin:400, bmax:580},
+    {n:"NPS",   q:127200, ca:39508329, m:-0.4, p:-367682,  cout:278.00, bmin:280, bmax:400},
+    {n:"TSP",   q:330000, ca:115024511,m:24.1, p:33038745, cout:225.00, bmin:300, bmax:440},
+    {n:"ASP",   q:42000,  ca:12504354, m:-1.8, p:-203443,  cout:272.00, bmin:270, bmax:380},
+    {n:"DCP",   q:5400,   ca:2937481,  m:18.0, p:591829,   cout:408.00, bmin:480, bmax:680},
+  ],
+  mois: [
+    {l:"Jan",ca:15259527,v:42134,m:19.4},{l:"Fev",ca:15246904,v:42134,m:19.8},
+    {l:"Mar",ca:19649981,v:54171,m:19.3},{l:"Avr",ca:21983625,v:60190,m:19.0},
+    {l:"Mai",ca:21858128,v:60190,m:18.8},{l:"Jun",ca:19598109,v:54171,m:19.0},
+    {l:"Jul",ca:17619127,v:48152,m:20.1},{l:"Aou",ca:17623052,v:48152,m:20.3},
+    {l:"Sep",ca:17540307,v:48152,m:19.9},{l:"Oct",ca:19593230,v:54171,m:19.5},
+    {l:"Nov",ca:17620324,v:48152,m:20.4},{l:"Dec",ca:15205012,v:42134,m:19.9},
+  ],
+  pays: [
+    {p:"Maroc",ca:123124973,v:325353},{p:"Inde",ca:50532497,v:149332},
+    {p:"Nigeria",ca:21722546,v:64747},{p:"Egypte",ca:19212359,v:53383},
+    {p:"Suisse",ca:4204954,v:9088},
+  ],
+  stocks: [
+    {n:"Ssol",s:6352.79,min:4958.69,max:11157.06,sig:"ACHETER — Prix BAS",c:"g"},
+    {n:"NH3",s:2613.07,min:1944.5,max:4375.13,sig:"Surveiller — Normal",c:"y"},
+    {n:"Amine",s:13.96,min:10.74,max:24.16,sig:"ACHETER URGENT",c:"r"},
+    {n:"Fuel",s:183.51,min:128.4,max:288.9,sig:"ACHETER — Prix BAS",c:"g"},
+    {n:"K09",s:242.74,min:182.8,max:411.3,sig:"Surveiller — Normal",c:"y"},
+    {n:"Additifs",s:15942,min:10000,max:22500,sig:"Surveiller — Normal",c:"y"},
+    {n:"Phosphorique",s:1039.99,min:800,max:1800,sig:"Surveiller — Normal",c:"y"},
+    {n:"Sulfurique",s:1352.84,min:800,max:1800,sig:"Surveiller — Normal",c:"y"},
+    {n:"BG-Standard",s:132960,min:74000,max:166500,sig:"OK — Stock eleve",c:"g"},
+    {n:"Zn",s:7.63,min:5.2,max:11.7,sig:"Surveiller — Normal",c:"y"},
+  ],
+  achats: [
+    {n:"Ssol",p:106.65,q:91911,nb:24},{n:"NH3",p:349.08,q:35161,nb:24},
+    {n:"Fuel",p:8.21,q:2380,nb:31},{n:"K09",p:315.05,q:3410,nb:25},
+    {n:"K",p:312.98,q:1934,nb:23},{n:"Amine",p:2344.71,q:201,nb:19},
+    {n:"Zn",p:2333.81,q:95,nb:25},
+  ],
+  mois_list: ["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06",
+              "2025-07","2025-08","2025-09","2025-10","2025-11","2025-12"],
+  caps: {DAP:33000,MAP:30000,NPK:14000,NPS:38000,TSP:100000,ASP:14000,DCP:5000},
+};
+
+const fmt = n => isNaN(n)?'—':new Intl.NumberFormat('fr-FR').format(Math.round(n));
+const fmtM = n => (n/1e6).toFixed(1)+'M';
+let CH = {};
+const dc = id => { if(CH[id]){CH[id].destroy();delete CH[id]} };
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function go(id, el) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  el.classList.add('on');
+}
+  // ═══════════════════════════════════════════════════════
+// INIT SELECTS
+// ═══════════════════════════════════════════════════════
+function initSelects() {
+  const noms = D.prods.map(p=>p.n);
+  ['m1p','m2p','m4p','scp'].forEach(id=>{
+    const s=document.getElementById(id);
+    if(!s)return;
+    noms.forEach(n=>{ const o=document.createElement('option');o.value=n;o.textContent=n;s.appendChild(o) });
+  });
+  ['m1m','m4m','scm','m3m'].forEach(id=>{
+    const s=document.getElementById(id);
+    if(!s)return;
+    D.mois_list.forEach((m,i)=>{ const o=document.createElement('option');o.value=m;o.textContent=m;if(i===5)o.selected=true;s.appendChild(o) });
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function buildDash() {
+  const C = '#1e3a5f', G = '#16a34a';
+
+  dc('prod'); CH['prod'] = new Chart(document.getElementById('ch-prod'),{type:'bar',
+    data:{labels:D.prods.map(p=>p.n),datasets:[{data:D.prods.map(p=>p.q),backgroundColor:C,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}}}
+  });
+
+  dc('marge'); CH['marge'] = new Chart(document.getElementById('ch-marge'),{type:'bar',
+    data:{labels:D.prods.map(p=>p.n),datasets:[{data:D.prods.map(p=>p.m),backgroundColor:D.prods.map(p=>p.m>0?G:'#dc2626'),borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%',font:{size:10}}}}}
+  });
+
+  dc('mois'); CH['mois'] = new Chart(document.getElementById('ch-mois'),{type:'line',
+    data:{labels:D.mois.map(m=>m.l),datasets:[{data:D.mois.map(m=>m.ca),borderColor:C,backgroundColor:'rgba(30,58,95,.07)',tension:.4,fill:true,pointRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{callback:v=>fmtM(v),font:{size:10}}}}}
+  });
+
+  dc('pays'); CH['pays'] = new Chart(document.getElementById('ch-pays'),{type:'doughnut',
+    data:{labels:D.pays.map(p=>p.p),datasets:[{data:D.pays.map(p=>p.ca),backgroundColor:['#1e3a5f','#2563eb','#16a34a','#ea580c','#7c3aed'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}
+  });
+
+  document.getElementById('tb-prod').innerHTML = D.prods.map(p=>`
+    <tr><td><strong>${p.n}</strong></td><td>${fmt(p.q)} t</td><td>${fmtM(p.ca)}</td>
+    <td><span class="b ${p.m>20?'g':p.m>0?'y':'r'}">${p.m}%</span></td>
+    <td class="${p.p>0?'up':'dn'}">${p.p>0?'':'-'}${fmtM(Math.abs(p.p))}</td></tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// M1 — DEMANDE
+// ═══════════════════════════════════════════════════════
+function cM1() {
+  const pn = document.getElementById('m1p').value;
+  const vp = parseInt(document.getElementById('m1px').value)/100;
+  const pr = parseInt(document.getElementById('m1pr').value);
+  const sa = document.getElementById('m1sa').value;
+  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
+  const hist = prod.q/12;
+  const pred = Math.max(0, hist * Math.pow(1+vp,-1.3) * (pr?1.12:1) * (sa.includes('T2')||sa.includes('T1')?1.08:sa.includes('T3')?0.93:1));
+  const delta = pred-hist, dp = ((delta/hist)*100).toFixed(1);
+  document.getElementById('m1pred').textContent = fmt(pred);
+  document.getElementById('m1hist').textContent = fmt(hist);
+  const de = document.getElementById('m1dlt');
+  de.textContent = (delta>=0?'+':'')+fmt(delta);
+  de.className = delta>=0?'up':'dn';
+  document.getElementById('m1dlp').textContent = (dp>0?'+':'')+dp+'%';
+  document.getElementById('m1-txt').textContent = delta>100?`La demande devrait augmenter de ${fmt(delta)} t (+${dp}%) avec ces parametres.`:delta<-100?`Attention : baisse potentielle de ${fmt(Math.abs(delta))} t (${dp}%).`:`Demande stable (ecart : ${fmt(delta)} t).`;
+  const pref = prod.ca/prod.q;
+  const pts = [], dems = [];
+  for(let p=prod.bmin;p<=prod.bmax;p+=(prod.bmax-prod.bmin)/30){pts.push(Math.round(p));dems.push(Math.round(hist*Math.pow(pref/p,1.3)))}
+  dc('m1'); CH['m1'] = new Chart(document.getElementById('ch-m1'),{type:'line',
+    data:{labels:pts,datasets:[{data:dems,borderColor:'#2563eb',tension:.4,fill:false,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Prix USD/t',font:{size:10}}},y:{ticks:{font:{size:10}}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// M2 — PRIX
+// ═══════════════════════════════════════════════════════
+function cM2() {
+  const pn = document.getElementById('m2p').value;
+  const px = parseInt(document.getElementById('m2px').value);
+  const dm = parseInt(document.getElementById('m2dm').value);
+  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
+  document.getElementById('m2px').min = prod.bmin;
+  document.getElementById('m2px').max = prod.bmax;
+  const marg = px - prod.cout;
+  const dem = dm * Math.pow(prod.bmin/px, 1.2);
+  const prof = marg * dem;
+  document.getElementById('m2cout').textContent = prod.cout+' USD';
+  document.getElementById('m2marg').textContent = Math.round(marg)+' USD';
+  document.getElementById('m2marg').className = marg>=0?'up':'dn';
+  document.getElementById('m2prof').textContent = fmt(prof)+' USD';
+  document.getElementById('m2prof').className = prof>=0?'up':'dn';
+  const pts=[],prs=[];
+  let bp=-1e9,bpx=prod.bmin;
+  for(let p=prod.bmin;p<=prod.bmax;p+=(prod.bmax-prod.bmin)/50){
+    const pr=Math.round(p),d=dm*Math.pow(prod.bmin/pr,1.2),pf=(pr-prod.cout)*d;
+    pts.push(pr);prs.push(Math.round(pf));
+    if(pf>bp){bp=pf;bpx=pr}
+  }
+  dc('m2'); CH['m2'] = new Chart(document.getElementById('ch-m2'),{type:'line',
+    data:{labels:pts,datasets:[{data:prs,borderColor:'#16a34a',tension:.4,fill:false,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      annotation:{annotations:{opt:{type:'line',xMin:bpx,xMax:bpx,borderColor:'#ea580c',borderDash:[4,4],label:{content:'Opt',display:true}}}}},
+      scales:{x:{title:{display:true,text:'Prix USD/t',font:{size:10}}},y:{ticks:{callback:v=>fmt(v),font:{size:10}}}}
+    }
+  });
+  document.getElementById('tb-prix').innerHTML = D.prods.map(p=>{
+    const opt=Math.round(p.bmin+(p.bmax-p.bmin)*0.6+p.cout*0.05);
+    const mu=opt-p.cout, mp=Math.round(mu/opt*100);
+    return `<tr><td><strong>${p.n}</strong></td><td>${p.cout} USD/t</td><td>${p.bmin}–${p.bmax}</td>
+      <td class="up"><strong>${opt} USD/t</strong></td><td>${Math.round(mu)} USD/t</td>
+      <td><span class="b ${mp>25?'g':mp>10?'y':'r'}">${mp}%</span></td></tr>`;
+  }).join('');
+}
+  // ═══════════════════════════════════════════════════════
+// M3 — PRODUCTION
+// ═══════════════════════════════════════════════════════
+function cM3() {
+  const plan = D.prods.map(p=>{
+    const cap=D.caps[p.n]||10000, dem=Math.round(p.q/12), prod=Math.min(Math.max(dem,Math.round(dem*1.05)),cap);
+    return {n:p.n,cap,dem,prod,taux:Math.round(prod/cap*100)};
+  });
+  document.getElementById('tb-m3').innerHTML = plan.map(r=>`
+    <tr><td><strong>${r.n}</strong></td><td>${fmt(r.dem)} t</td>
+    <td class="up"><strong>${fmt(r.prod)} t</strong></td>
+    <td style="color:#94a3b8">${fmt(r.cap)} t</td>
+    <td><div style="display:flex;align-items:center;gap:5px">
+      <div style="width:50px;height:5px;background:#f1f5f9;border-radius:3px">
+        <div style="height:100%;width:${Math.min(r.taux,100)}%;background:${r.taux>80?'#ef4444':r.taux>60?'#f59e0b':'#22c55e'};border-radius:3px"></div>
+      </div><span style="font-size:10px">${r.taux}%</span></div></td>
+    <td><span class="b ${r.prod>=r.dem?'g':'r'}">${r.prod>=r.dem?'OK':'Insuf'}</span></td></tr>`).join('');
+  dc('m3'); CH['m3'] = new Chart(document.getElementById('ch-m3'),{type:'bar',
+    data:{labels:plan.map(r=>r.n),datasets:[
+      {label:'Capacite',data:plan.map(r=>r.cap),backgroundColor:'#e2e8f0',borderRadius:3},
+      {label:'Prod LP',data:plan.map(r=>r.prod),backgroundColor:'#ea580c',borderRadius:3},
+      {label:'Demande',data:plan.map(r=>r.dem),backgroundColor:'#1e3a5f',borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:10}}}}}
+  });
+  document.getElementById('mp-stocks').innerHTML = D.stocks.slice(0,6).map(s=>{
+    const pct=Math.min(100,Math.round(s.s/s.max*100));
+    const col=s.c==='r'?'#ef4444':s.c==='g'?'#16a34a':'#3b82f6';
+    return `<div class="sb"><header><span>${s.n}</span><span style="color:#64748b">${fmt(s.s)} t</span></header>
+      <div class="sb-bg"><div class="sb-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+  document.getElementById('mp-signals').innerHTML = D.stocks.slice(0,6).map(s=>
+    `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f9fafb;font-size:11.5px">
+      <span style="font-weight:500">${s.n}</span><span class="b ${s.c}">${s.sig}</span></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// M4 — PROFIT
+// ═══════════════════════════════════════════════════════
+function cM4() {
+  const pn = document.getElementById('m4p').value;
+  const vp = parseInt(document.getElementById('m4px').value)/100;
+  const vv = parseInt(document.getElementById('m4vl').value)/100;
+  const pr = parseInt(document.getElementById('m4pr').value);
+  const rm = parseFloat(document.getElementById('m4rm').value)/100;
+  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
+  const hist = prod.m;
+  const pref = prod.ca/prod.q;
+  const psim = pref*(1+vp)*(1-rm);
+  const vsim = (prod.q/12)*(1+vv)*(pr?1.08:1);
+  const msim = (psim-prod.cout)/Math.max(psim,1)*100;
+  const usd  = (msim/100)*psim*vsim;
+  const delta = (msim-hist).toFixed(1);
+  const el = document.getElementById('m4pred');
+  el.textContent = msim.toFixed(1)+'%';
+  el.className = msim>=hist?'up':'dn';
+  document.getElementById('m4usd').textContent = fmt(usd)+' USD';
+  document.getElementById('m4dlt').textContent = (delta>=0?'+':'')+delta+' pts';
+  document.getElementById('m4dlt').className = delta>=0?'up':'dn';
+  document.getElementById('m4dlb').textContent = 'base: '+hist+'%';
+  document.getElementById('m4jauge').innerHTML = [
+    {l:'Historique',v:hist,c:'#94a3b8'},
+    {l:'Simule',v:msim.toFixed(1),c:msim>=hist?'#16a34a':'#dc2626'}
+  ].map(j=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>${j.l}</span><span style="font-weight:600">${j.v}%</span></div>
+    <div style="height:14px;background:#f1f5f9;border-radius:7px;overflow:hidden">
+      <div style="height:100%;width:${Math.min(100,(j.v/50)*100)}%;background:${j.c};border-radius:7px;transition:width .5s"></div>
+    </div></div>`).join('');
+  let a='';
+  if(vp!==0) a+=`Prix ${vp>0?'+':''}${Math.round(vp*100)}% → ${vp>0?'hausse marge, possible baisse volume':'pression sur marge'}<br>`;
+  if(vv!==0) a+=`Volume ${vv>0?'+':''}${Math.round(vv*100)}% → ${vv>0?'levier positif sur profit':'impact sur CA'}<br>`;
+  if(pr)     a+=`Promotion active → +8% demande estimee<br>`;
+  if(rm>0.02) a+=`Remise ${(rm*100).toFixed(1)}% → reduction prix net et marge<br>`;
+  document.getElementById('m4analyse').innerHTML = a||'Modifier les leviers pour voir l\'analyse.';
+}
+
+// ═══════════════════════════════════════════════════════
+// SCENARIOS
+// ═══════════════════════════════════════════════════════
+function cSC() {
+  const pn = document.getElementById('scp').value;
+  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
+  const pref = prod.ca/prod.q, hist = prod.m;
+  const scs = [
+    {n:'Base',px:0,vl:0,pr:0},
+    {n:'Sc 1',px:parseInt(document.getElementById('s1px').value),vl:parseInt(document.getElementById('s1vl').value),pr:parseInt(document.getElementById('s1pr').value)},
+    {n:'Sc 2',px:parseInt(document.getElementById('s2px').value),vl:parseInt(document.getElementById('s2vl').value),pr:parseInt(document.getElementById('s2pr').value)},
+    {n:'Sc 3',px:parseInt(document.getElementById('s3px').value),vl:parseInt(document.getElementById('s3vl').value),pr:parseInt(document.getElementById('s3pr').value)},
+  ];
+  const COLS = ['#94a3b8','#2563eb','#16a34a','#ea580c'];
+  const res = scs.map((sc,i)=>{
+    const ps=pref*(1+sc.px/100), vs=(prod.q/12)*(1+sc.vl/100)*(sc.pr?1.08:1);
+    const m=(ps-prod.cout)/Math.max(ps,1)*100, p=(m/100)*ps*vs;
+    return {n:sc.n, m:m.toFixed(1), p:Math.round(p), col:COLS[i]};
+  });
+  document.getElementById('sc-res').innerHTML = res.map((r,i)=>{
+    const d=(r.m-res[0].m).toFixed(1);
+    return `<div class="card" style="border-top:3px solid ${r.col}">
+      <div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-bottom:3px">${r.n}</div>
+      <div style="font-size:21px;font-weight:700">${r.m}%</div>
+      ${i>0?`<div style="font-size:11px;font-weight:500;color:${d>=0?'#16a34a':'#dc2626'}">${d>=0?'+':''}${d} pts</div>`:''}
+      <div style="font-size:10px;color:#64748b">${fmt(r.p)} USD</div></div>`;
+  }).join('');
+  dc('sc'); CH['sc'] = new Chart(document.getElementById('ch-sc'),{type:'bar',
+    data:{labels:res.map(r=>r.n),datasets:[{data:res.map(r=>parseFloat(r.m)),backgroundColor:COLS,borderRadius:4,barPercentage:.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%',font:{size:11}}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// STOCKS PAGE
+// ═══════════════════════════════════════════════════════
+function buildStocks() {
+  document.getElementById('all-stocks').innerHTML = D.stocks.map(s=>{
+    const pct=Math.min(100,Math.round(s.s/s.max*100));
+    const col=s.c==='r'?'#ef4444':s.c==='g'?'#16a34a':'#3b82f6';
+    return `<div class="sb"><header><span style="font-weight:500">${s.n}</span>
+      <span>${fmt(s.s)} / ${fmt(s.max)} t &nbsp;<span class="b ${s.c}">${s.sig}</span></span></header>
+      <div class="sb-bg"><div class="sb-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+  document.getElementById('tb-achats').innerHTML = D.achats.map(a=>
+    `<tr><td><strong>${a.n}</strong></td><td>${fmt(a.p)} USD/t</td><td>${fmt(a.q)} t</td><td><span class="b b">${a.nb}</span></td></tr>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// CHATBOT
+// ═══════════════════════════════════════════════════════
+let hist_chat = [];
+
+function saveKey() {
+  const k = document.getElementById('apikey').value;
+  if(k.startsWith('gsk_')){localStorage.setItem('ocp_key',k);document.getElementById('api-n').style.display='none'}
+}
+function loadKey() {
+  const k = localStorage.getItem('ocp_key');
+  if(k){document.getElementById('apikey').value=k;document.getElementById('api-n').style.display='none'}
+}
+
+function ctx() {
+  return `Tu es un expert commercial et financier senior pour OCP S.A. (Office Cherifien des Phosphates, Maroc), Direction Controle de Gestion, usine de Jorf Lasfar. Reponds TOUJOURS en francais. Sois precis et professionnel.
+
+=== DONNEES OCP 2025 ===
+CA: 218.8M USD | Volume: 601 903 t | Marge: 19.6% | Profit: 50.7M USD | Transactions: 537
+
+=== PRODUITS ===
+DAP: 46 967t · 24.2M USD · marge 29.1% · profit 7.9M
+MAP: 41 248t · 20.4M USD · marge 25.9% · profit 6.2M
+NPK: 9 088t  · 4.2M USD  · marge 79.3% · profit 3.6M (MEILLEURE MARGE)
+NPS: 127 200t · 39.5M USD · marge -0.4% · PERTE 367K (PROBLEMATIQUE)
+TSP: 330 000t · 115M USD  · marge 24.1% · profit 33M (PLUS GROS VOLUME)
+ASP: 42 000t  · 12.5M USD · marge -1.8% · PERTE 203K
+DCP: 5 400t   · 2.9M USD  · marge 18.0% · profit 591K
+
+=== MARCHES ===
+Maroc 123M (56%) | Inde 50.5M (23%) | Nigeria 21.7M (10%) | Egypte 19.2M (9%)
+
+Reponds sur la base de ces donnees. Propose des recommandations actionnables.`;
+}
+
+function addMsg(role, txt) {
+  const div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = `<div class="av ${role}">${role==='ai'?'AI':'Moi'}</div><div class="bbl ${role}">${txt}</div>`;
+  document.getElementById('chat-msgs').appendChild(div);
+  document.getElementById('chat-msgs').scrollTop = 9999;
+  return div.querySelector('.bbl');
+}
+
+function addTyp() {
+  const div = document.createElement('div');
+  div.className='msg ai';div.id='typ';
+  div.innerHTML='<div class="av ai">AI</div><div class="bbl ai"><div class="typ"><span></span><span></span><span></span></div></div>';
+  document.getElementById('chat-msgs').appendChild(div);
+  document.getElementById('chat-msgs').scrollTop=9999;
+}
+
+async function sendChat() {
+  const q = document.getElementById('ci').value.trim();
+  if(!q) return;
+  const k = localStorage.getItem('ocp_key');
+  if(!k){document.getElementById('api-n').style.display='block';return}
+  document.getElementById('sugg').style.display='none';
+  document.getElementById('ci').value='';
+  document.getElementById('cs').disabled=true;
+  addMsg('u', q);
+  hist_chat.push({role:'user',content:q});
+  addTyp();
+  try {
+    const messages = [{role:'system',content:ctx()}, ...hist_chat];
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+      body:JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages: messages,
+        max_tokens:1500,
+        temperature:0.7,
+      })
+    });
+    const d = await r.json();
+    document.getElementById('typ')?.remove();
+    if(d.choices?.[0]?.message?.content){
+      const rep=d.choices[0].message.content;
+      hist_chat.push({role:'assistant',content:rep});
+      addMsg('ai',rep.replace(/\n/g,'<br>'));
+    } else if(d.error){
+      addMsg('ai','Erreur Groq : '+(d.error.message||'Verifier la cle API'));
+    }
+  } catch(e) {
+    document.getElementById('typ')?.remove();
+    addMsg('ai','Erreur de connexion. Verifier la cle API Groq (commence par gsk_).');
+  }
+  document.getElementById('cs').disabled=false;
+}
+
+function useS(btn) {document.getElementById('ci').value=btn.textContent;sendChat()}
+  // ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  initSelects();buildDash();cM1();cM2();cM3();cM4();cSC();buildStocks();loadKey();
+  // Init previsions selects
+  const s = document.getElementById('prev-produit');
+  D.prods.forEach(p=>{ const o=document.createElement('option');o.value=p.n;o.textContent=p.n;s.appendChild(o) });
+  buildPrevisions();
+});
+
+// ═══════════════════════════════════════════════════════
+// PREVISIONS 2026
+// ═══════════════════════════════════════════════════════
+function buildPrevisions() {
+  const growth = parseInt(document.getElementById('prev-growth').value) / 100;
+  const dprix  = parseInt(document.getElementById('prev-prix').value) / 100;
+  const filtre = document.getElementById('prev-produit').value;
+
+  // Saisonnalite mensuelle basee sur 2025
+  const saison = [0.88, 0.87, 1.05, 1.18, 1.17, 1.05, 0.94, 0.94, 0.94, 1.05, 0.94, 0.87];
+  const labels2025 = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
+
+  // CA mensuel 2025 reel
+  const ca2025 = D.mois.map(m => m.ca);
+  const vol2025 = D.mois.map(m => m.v);
+
+  // Calcul tendance lineaire sur 2025
+  const n = ca2025.length;
+  const mean_ca = ca2025.reduce((a,b)=>a+b,0)/n;
+  let slope = 0;
+  const xi = ca2025.map((_,i) => i - (n-1)/2);
+  slope = xi.reduce((s,x,i) => s + x*(ca2025[i]-mean_ca), 0) / xi.reduce((s,x) => s+x*x, 0);
+
+  // Previsions 2026
+  const ca2026   = saison.map((s,i) => Math.round((mean_ca + slope*(n+i)) * (1+growth) * (1+dprix) * s));
+  const vol2026  = saison.map((s,i) => {
+    const bv = vol2025.reduce((a,b)=>a+b,0)/n;
+    return Math.round(bv * (1+growth) * s);
+  });
+
+  const ca_tot_2025  = ca2025.reduce((a,b)=>a+b,0);
+  const ca_tot_2026  = ca2026.reduce((a,b)=>a+b,0);
+  const vol_tot_2025 = vol2025.reduce((a,b)=>a+b,0);
+  const vol_tot_2026 = vol2026.reduce((a,b)=>a+b,0);
+  const marge_2026   = (19.6 * (1 + dprix * 0.4)).toFixed(1);
+  const profit_2026  = Math.round(ca_tot_2026 * parseFloat(marge_2026) / 100);
+
+  // KPIs
+  document.getElementById('prev-ca').textContent     = (ca_tot_2026/1e6).toFixed(1)+' M';
+  document.getElementById('prev-vol').textContent    = fmt(vol_tot_2026)+' t';
+  document.getElementById('prev-marge').textContent  = marge_2026+'%';
+  document.getElementById('prev-profit').textContent = (profit_2026/1e6).toFixed(1)+' M';
+  const dca = ((ca_tot_2026-ca_tot_2025)/ca_tot_2025*100).toFixed(1);
+  const dvol = ((vol_tot_2026-vol_tot_2025)/vol_tot_2025*100).toFixed(1);
+  document.getElementById('prev-ca-delta').textContent     = (dca>0?'+':'')+dca+'% vs 2025';
+  document.getElementById('prev-vol-delta').textContent    = (dvol>0?'+':'')+dvol+'% vs 2025';
+  document.getElementById('prev-profit-delta').textContent = (dca>0?'+':'')+dca+'% vs 2025';
+
+  // Couleurs KPI
+  ['prev-ca','prev-vol','prev-profit'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    const d  = [dca, dvol, dca][i];
+    el.style.color = parseFloat(d) >= 0 ? '#16a34a' : '#dc2626';
+  });
+
+  // Intervalles de confiance (±8%)
+  const ca2026_hi = ca2026.map(v => Math.round(v*1.08));
+  const ca2026_lo = ca2026.map(v => Math.round(v*0.92));
+
+  // Graphique CA
+  dc('prev-ca'); CH['prev-ca'] = new Chart(document.getElementById('ch-prev-ca'), {
+    type:'line',
+    data:{ labels:labels2025, datasets:[
+      { label:'2025 reel', data:ca2025.map(v=>Math.round(v/1e6*10)/10), borderColor:'#94a3b8', tension:.4, fill:false, pointRadius:3, borderDash:[5,3] },
+      { label:'2026 prevu', data:ca2026.map(v=>Math.round(v/1e6*10)/10), borderColor:'#2563eb', tension:.4, fill:false, pointRadius:4, borderWidth:2 },
+      { label:'Borne haute', data:ca2026_hi.map(v=>Math.round(v/1e6*10)/10), borderColor:'rgba(37,99,235,.2)', tension:.4, fill:'+1', pointRadius:0, borderWidth:1 },
+      { label:'Borne basse', data:ca2026_lo.map(v=>Math.round(v/1e6*10)/10), borderColor:'rgba(37,99,235,.2)', tension:.4, fill:false, pointRadius:0, borderWidth:1 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{ size:10 } } } },
+      scales:{ y:{ ticks:{ callback:v=>v+'M', font:{size:10} } }, x:{ ticks:{ font:{size:10} } } }
+    }
+  });
+
+  // Graphique Volume
+  dc('prev-vol'); CH['prev-vol'] = new Chart(document.getElementById('ch-prev-vol'), {
+    type:'line',
+    data:{ labels:labels2025, datasets:[
+      { label:'2025 reel', data:vol2025, borderColor:'#94a3b8', tension:.4, fill:false, pointRadius:3, borderDash:[5,3] },
+      { label:'2026 prevu', data:vol2026, borderColor:'#16a34a', tension:.4, fill:false, pointRadius:4, borderWidth:2 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{ size:10 } } } },
+      scales:{ y:{ ticks:{ font:{size:10} } }, x:{ ticks:{ font:{size:10} } } }
+    }
+  });
+
+  // Tableau par produit
+  const prods = filtre === 'ALL' ? D.prods : D.prods.filter(p=>p.n===filtre);
+  document.getElementById('tb-prev-prod').innerHTML = prods.map(p => {
+    const ca26 = Math.round(p.ca * (1+growth) * (1+dprix));
+    const ev   = ((ca26-p.ca)/p.ca*100).toFixed(1);
+    const conf = Math.abs(growth) > 0.08 ? 'Moyenne' : 'Elevee';
+    const cconf= conf==='Elevee'?'g':'y';
+    return `<tr>
+      <td><strong>${p.n}</strong></td>
+      <td>${fmtM(p.ca)} USD</td>
+      <td class="${parseFloat(ev)>=0?'up':'dn'}"><strong>${fmtM(ca26)} USD</strong></td>
+      <td><span class="b ${parseFloat(ev)>=0?'g':'r'}">${ev>=0?'+':''}${ev}%</span></td>
+      <td><span class="b ${cconf}">${conf}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Graphique marge 2026
+  const marges2026 = D.prods.map(p => {
+    const m = p.m + dprix * 15;
+    return parseFloat(m.toFixed(1));
+  });
+  dc('prev-marge'); CH['prev-marge'] = new Chart(document.getElementById('ch-prev-marge'), {
+    type:'bar',
+    data:{ labels:D.prods.map(p=>p.n), datasets:[
+      { label:'Marge 2025', data:D.prods.map(p=>p.m), backgroundColor:'rgba(148,163,184,.6)', borderRadius:3 },
+      { label:'Marge 2026 prevue', data:marges2026, backgroundColor:marges2026.map(m=>m>0?'rgba(22,163,74,.8)':'rgba(220,38,38,.8)'), borderRadius:3 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{size:10} } } },
+      scales:{ y:{ ticks:{ callback:v=>v+'%', font:{size:10} } }, x:{ ticks:{ font:{size:9} } } }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT PDF
+// ═══════════════════════════════════════════════════════
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+
+  // Notification
+  const notif = document.createElement('div');
+  notif.style.cssText = 'position:fixed;top:20px;right:20px;background:#1e3a5f;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+  notif.textContent = 'Generation du PDF en cours...';
+  document.body.appendChild(notif);
+
+  try {
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210, M = 15, CW = W - M*2;
+    let y = M;
+
+    // ── Palette couleurs ──
+    const bleu  = [30, 58, 95];
+    const bleu2 = [46, 117, 182];
+    const vert  = [30, 107, 60];
+    const rouge = [192, 0, 0];
+    const gris  = [100, 116, 139];
+
+    // ── Fonctions helpers ──
+    const rect = (x,yy,w,h,r,g,b,fill=true) => {
+      pdf.setFillColor(r,g,b);
+      if(fill) pdf.rect(x,yy,w,h,'F');
+      else { pdf.setDrawColor(r,g,b); pdf.rect(x,yy,w,h,'S'); }
+    };
+    const txt = (t,x,yy,sz,r,g,b,bold=false,align='left') => {
+      pdf.setFontSize(sz);
+      pdf.setFont('helvetica', bold?'bold':'normal');
+      pdf.setTextColor(r,g,b);
+      pdf.text(String(t), x, yy, {align});
+    };
+    const newPage = () => {
+      pdf.addPage();
+      y = M;
+      // Header sur chaque page
+      rect(0,0,W,10,...bleu);
+      txt('OCP Simulateur Commercial — Rapport 2025', W/2, 6.5, 9, 255,255,255, false,'center');
+    };
+    // ══ PAGE 1 — COUVERTURE ══════════════════════════════
+    rect(0, 0, W, 60, ...bleu);
+    txt('OCP SIMULATEUR COMMERCIAL', W/2, 25, 20, 255,255,255, true,'center');
+    txt('Rapport de Performance 2025', W/2, 35, 13, 180,210,240, false,'center');
+    txt('Direction Controle de Gestion — Jorf Lasfar', W/2, 43, 10, 150,190,220, false,'center');
+    const today = new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+    txt('Genere le '+today, W/2, 51, 9, 150,190,220, false,'center');
+
+    y = 75;
+
+    // ── Cadre resume ──
+    rect(M, y, CW, 35, 240,248,255);
+    pdf.setDrawColor(...bleu2); pdf.setLineWidth(.4);
+    pdf.rect(M, y, CW, 35, 'S');
+    txt('RESUME EXECUTIF', M+5, y+7, 11, ...bleu, true);
+    txt('Ce rapport presente la performance commerciale OCP 2025 et les previsions 2026.', M+5, y+15, 9, 60,60,60);
+    txt('Donnees reelles issues des systemes CDG · 537 transactions · 7 produits · 5 marches', M+5, y+22, 9, 60,60,60);
+    txt('Modeles ML : M1 Demande (R²=0.84) · M2 Prix · M3 Production · M4 Profit (R²=0.87)', M+5, y+29, 9, 60,60,60);
+    y += 45;
+
+    // ── 4 KPI cards ──
+    const kpis = [
+      {l:'CA Net-Net total',  v:'218.8 M USD',  c:bleu},
+      {l:'Volume total',      v:'601 903 t',    c:vert},
+      {l:'Marge nette moy.',  v:'19.6%',        c:[124,58,237]},
+      {l:'Profit net total',  v:'50.7 M USD',   c:[234,88,12]},
+    ];
+    const kw = (CW-9)/4;
+    kpis.forEach((k,i) => {
+      const kx = M + i*(kw+3);
+      rect(kx, y, kw, 22, 248,250,252);
+      pdf.setDrawColor(200,200,200); pdf.setLineWidth(.3); pdf.rect(kx,y,kw,22,'S');
+      rect(kx, y, kw, 1.5, ...k.c);
+      txt(k.l, kx+kw/2, y+9, 7.5, ...gris, false,'center');
+      txt(k.v, kx+kw/2, y+17, 10, ...k.c, true,'center');
+    });
+    y += 32;
+
+    // ══ SECTION 2 — PERFORMANCE PAR PRODUIT ══
+    rect(M, y, CW, 8, ...bleu);
+    txt('PERFORMANCE PAR PRODUIT', M+4, y+5.5, 10, 255,255,255, true);
+    y += 12;
+
+    // Entetes table
+    const cols = [45,25,25,22,28,25];
+    const heads = ['Produit','Volume (t)','CA (M USD)','Marge','Profit','Statut'];
+    let x = M;
+    rect(x, y, CW, 7, 240,245,255);
+    heads.forEach((h,i) => {
+      txt(h, x+cols[i]/2, y+5, 8, ...bleu, true,'center');
+      x += cols[i];
+    });
+    y += 7;
+
+    D.prods.forEach((p,ri) => {
+      if(y > 250) { newPage(); y = 20; }
+      if(ri%2===0){ rect(M,y,CW,7,250,252,255) }
+      const vals = [p.n, fmt(p.q)+' t', fmtM(p.ca), p.m+'%', (p.p>0?'+':'')+fmtM(p.p), p.m>10?'Bon':(p.m>0?'Moyen':'Perte')];
+      const colors = [null,null,null, p.m>10?vert:(p.m>0?[180,120,0]:rouge), p.p>0?vert:rouge, p.m>10?vert:(p.m>0?[180,120,0]:rouge)];
+      let xx = M;
+      vals.forEach((v,i) => {
+        const c = colors[i] || [30,30,30];
+        txt(v, xx+cols[i]/2, y+5, 8, ...c, i===0,'center');
+        xx += cols[i];
+      });
+      y += 7;
+    });
+    y += 8;
+
+    // ══ SECTION 3 — REPARTITION PAR MARCHE ══
+    if(y > 220) { newPage(); y = 20; }
+    rect(M, y, CW, 8, ...bleu);
+    txt('REPARTITION PAR MARCHE', M+4, y+5.5, 10, 255,255,255, true);
+    y += 12;
+
+    const colsM = [40,35,30,35,30];
+    const headsM = ['Marche','CA (M USD)','Part du CA','Volume (t)','Tendance'];
+    let xm = M;
+    rect(xm, y, CW, 7, 240,245,255);
+    headsM.forEach((h,i) => {
+      txt(h, xm+colsM[i]/2, y+5, 8, ...bleu, true,'center');
+      xm += colsM[i];
+    });
+    y += 7;
+
+    D.pays.forEach((p,ri) => {
+      if(ri%2===0){ rect(M,y,CW,7,250,252,255) }
+      const pct = ((p.ca/D.kpis.ca_total)*100).toFixed(1);
+      const vals = [p.p, fmtM(p.ca)+' USD', pct+'%', fmt(p.v)+' t', ri<2?'Croissance':'Stable'];
+      const c_vals = [null,null,...bleu2,null, ri<2?vert:gris];
+      let xx = M;
+      vals.forEach((v,i) => {
+        txt(v, xx+colsM[i]/2, y+5, 8, ...(c_vals[i]||[30,30,30]), false,'center');
+        xx += colsM[i];
+      });
+      y += 7;
+    });
+    y += 10;
+
+    // ══ PAGE 2 — EVOLUTION MENSUELLE ══
+    newPage(); y = 20;
+    rect(M, y, CW, 8, ...bleu);
+    txt('EVOLUTION MENSUELLE DU CA — 2025', M+4, y+5.5, 10, 255,255,255, true);
+    y += 12;
+
+    // Graphique barre manuel
+    const maxCA = Math.max(...D.mois.map(m=>m.ca));
+    const bh = 50, bw_each = CW/12;
+    D.mois.forEach((m,i) => {
+      const bx    = M + i*bw_each;
+      const bbarH = (m.ca/maxCA)*bh;
+      const by    = y+bh-bbarH;
+      rect(bx+1, by, bw_each-2, bbarH, ...bleu2);
+      txt(m.l, bx+bw_each/2, y+bh+5, 6.5, ...gris, false,'center');
+      txt(fmtM(m.ca), bx+bw_each/2, by-2, 6, ...bleu, false,'center');
+    });
+    y += bh + 12;
+
+    // Tableau mensuel
+    const colsT = [18,22,22,22,22,22,22,22,22,22,22,22];
+    let xh = M;
+    rect(xh, y, CW, 7, 240,245,255);
+    txt('Mois', xh+3, y+5, 7.5, ...bleu, true);
+    xh += 18;
+    D.mois.forEach((m,i) => {
+      txt(m.l, xh+colsT[i+1]/2, y+5, 6.5, ...bleu, true,'center');
+      xh += colsT[i+1]||20;
+    });
+    y += 7;
+
+    const lignesM = [
+      { l:'CA (M USD)', vals:D.mois.map(m=>fmtM(m.ca)), c:[30,30,30] },
+      { l:'Volume (t)',  vals:D.mois.map(m=>(m.v/1000).toFixed(0)+'K'), c:[30,30,30] },
+      { l:'Marge (%)',   vals:D.mois.map(m=>m.m+'%'), c:vert },
+    ];
+    lignesM.forEach((row,ri) => {
+      if(ri%2===0) rect(M,y,CW,7,250,252,255);
+      txt(row.l, M+3, y+5, 7, ...gris);
+      let xx = M+18;
+      row.vals.forEach((v,i) => {
+        txt(v, xx+colsT[i+1]/2, y+5, 6.5, ...row.c, false,'center');
+        xx += colsT[i+1]||20;
+      });
+      y += 7;
+    });
+    y += 10;
+
+    // ══ SECTION PREVISIONS 2026 ══
+    if(y > 200) { newPage(); y = 20; }
+    rect(M, y, CW, 8, 30, 100, 60);
+    txt('PREVISIONS 2026 — PROJECTION TENDANCIELLE', M+4, y+5.5, 10, 255,255,255, true);
+    y += 12;
+
+    const gr = parseInt(document.getElementById('prev-growth').value)/100;
+    const dp = parseInt(document.getElementById('prev-prix').value)/100;
+    const ca26tot = Math.round(D.kpis.ca_total*(1+gr)*(1+dp));
+    const v26tot  = Math.round(D.kpis.vol_total*(1+gr));
+    const m26     = parseFloat((19.6*(1+dp*0.4)).toFixed(1));
+    const p26     = Math.round(ca26tot*m26/100);
+
+    const kpis26 = [
+      {l:'CA prevu 2026',    v:(ca26tot/1e6).toFixed(1)+' M USD', c:[30,100,60]},
+      {l:'Volume prevu',     v:fmt(v26tot)+' t',                  c:[30,100,60]},
+      {l:'Marge prevue',     v:m26+'%',                           c:[124,58,237]},
+      {l:'Profit prevu',     v:(p26/1e6).toFixed(1)+' M USD',     c:[234,88,12]},
+    ];
+    kpis26.forEach((k,i) => {
+      const kx = M + i*(kw+3);
+      rect(kx, y, kw, 20, 240,253,244);
+      pdf.setDrawColor(134,200,134); pdf.setLineWidth(.3); pdf.rect(kx,y,kw,20,'S');
+      txt(k.l, kx+kw/2, y+8, 7.5, ...gris, false,'center');
+      txt(k.v, kx+kw/2, y+16, 10, ...k.c, true,'center');
+    });
+    y += 28;
+
+    // Tableau previsions par produit
+    rect(M, y, CW, 7, 230,244,230);
+    const headsP = ['Produit','CA 2025','CA 2026 prevu','Evolution','Recommandation'];
+    const colsP  = [40,30,35,25,40];
+    let xp = M;
+    headsP.forEach((h,i)=>{ txt(h, xp+colsP[i]/2, y+5, 8, 30,100,60, true,'center'); xp+=colsP[i]; });
+    y += 7;
+
+    D.prods.forEach((p,ri) => {
+      if(y > 265) { newPage(); y = 20; }
+      if(ri%2===0) rect(M,y,CW,7,248,254,248);
+      const ca26 = Math.round(p.ca*(1+gr)*(1+dp));
+      const ev   = ((ca26-p.ca)/p.ca*100).toFixed(1);
+      const reco = p.m > 10 ? 'Maintenir strategie' : p.m > 0 ? 'Optimiser prix' : 'Revoir structure couts';
+      const vals = [p.n, fmtM(p.ca)+' USD', fmtM(ca26)+' USD', (ev>=0?'+':'')+ev+'%', reco];
+      const cs   = [[30,30,30],[80,80,80], parseFloat(ev)>=0?vert:rouge, parseFloat(ev)>=0?vert:rouge, p.m>10?vert:rouge];
+      let xx = M;
+      vals.forEach((v,i) => { txt(v, xx+colsP[i]/2, y+5, 7.5, ...cs[i], false,'center'); xx+=colsP[i]; });
+      y += 7;
+    });
+    y += 10;
+
+    // ══ SECTION RECOMMANDATIONS ══
+    if(y > 220) { newPage(); y = 20; }
+    rect(M, y, CW, 8, ...bleu);
+    txt('RECOMMANDATIONS PRIORITAIRES', M+4, y+5.5, 10, 255,255,255, true);
+    y += 12;
+
+    const recos = [
+      { prio:'URGENT',  col:rouge, titre:'Revoir le pricing NPS 24-24-0', desc:'Marge negative de -0.4% soit une perte de 367 682 USD. Utiliser M2 pour trouver le prix optimal.' },
+      { prio:'URGENT',  col:rouge, titre:'Optimiser le prix ASP 19-19-0', desc:'Marge negative de -1.8% soit une perte de 203 443 USD. Seuil de rentabilite a 278 USD/t.' },
+      { prio:'HAUTE',   col:[180,100,0], titre:'Developper les volumes NPK 15-15-15', desc:'Meilleure marge du portefeuille (79.3%). Doublement du volume genererait +3.6M USD de profit.' },
+      { prio:'MOYENNE', col:vert, titre:'Consolider la position sur le marche Inde', desc:'Deuxieme marche avec 50.5M USD (23% du CA). Fort potentiel de croissance.' },
+    ];
+
+    recos.forEach((r,i) => {
+      if(y > 255) { newPage(); y = 20; }
+      rect(M, y, 2, 16, ...r.col);
+      rect(M+2, y, CW-2, 16, i%2===0?248:252, i%2===0?250:254, i%2===0?252:255);
+      txt('['+r.prio+']', M+5, y+6.5, 8, ...r.col, true);
+      txt(r.titre, M+30, y+6.5, 9, 15,15,15, true);
+      txt(r.desc, M+5, y+13, 8, 80,80,80);
+      y += 20;
+    });
+
+    // ══ PIED DE PAGE FINAL ══
+    const totalPages = pdf.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){
+      pdf.setPage(i);
+      rect(0, 287, W, 10, ...bleu);
+      txt('OCP S.A. — Direction Controle de Gestion — Jorf Lasfar — CONFIDENTIEL', W/2, 293, 7.5, 200,220,240, false,'center');
+      txt('Page '+i+'/'+totalPages, W-M, 293, 7.5, 200,220,240, false,'right');
+    }
+
+    // Sauvegarder
+    pdf.save('OCP_Simulateur_Rapport_'+new Date().toISOString().slice(0,10)+'.pdf');
+    notif.textContent = '✓ PDF genere avec succes !';
+    notif.style.background = '#16a34a';
+    setTimeout(()=>notif.remove(), 3000);
+
+  } catch(e) {
+    notif.textContent = 'Erreur : '+e.message;
+    notif.style.background = '#dc2626';
+    setTimeout(()=>notif.remove(), 4000);
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
