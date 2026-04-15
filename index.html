@@ -1,1207 +1,1546 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>OCP Simulateur Commercial 2025</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OCP Procurement Intelligence — Simulateur Pro</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:#f1f5f9;color:#1e293b;display:flex;height:100vh;overflow:hidden;font-size:13px}
-/* SIDEBAR */
-aside{width:215px;min-width:215px;background:#1e3a5f;display:flex;flex-direction:column;overflow-y:auto}
-.logo{padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
-.logo h1{color:#fff;font-size:14px;font-weight:600;margin-bottom:2px}
-.logo p{color:rgba(255,255,255,.45);font-size:11px}
-.nav-sec{font-size:10px;color:rgba(255,255,255,.35);padding:14px 14px 4px;text-transform:uppercase;letter-spacing:.06em}
-.nav-btn{display:flex;align-items:center;gap:9px;padding:8px 14px;color:rgba(255,255,255,.6);cursor:pointer;transition:.15s;border-left:2px solid transparent;font-size:12.5px}
-.nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
-.nav-btn.on{background:rgba(255,255,255,.11);color:#fff;border-left-color:#60a5fa;font-weight:500}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.nav-footer{margin-top:auto;padding:10px 14px;border-top:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-size:10px}
-/* MAIN */
-main{flex:1;overflow-y:auto}
-.pg{display:none;padding:22px;max-width:1300px}
-.pg.on{display:block;animation:fi .2s ease}
-@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-/* PAGE HEADER */
-.ph h1{font-size:19px;font-weight:600;color:#0f172a;margin-bottom:2px}
-.ph p{color:#64748b;font-size:12px;margin-bottom:18px}
-/* KPI */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
-.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:14px;border-top:3px solid}
-.kpi label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
-.kpi strong{display:block;font-size:21px;font-weight:600;color:#0f172a;line-height:1}
-.kpi span{display:block;font-size:10px;color:#94a3b8;margin-top:3px}
-.kpi.bl{border-top-color:#2563eb}.kpi.gr{border-top-color:#16a34a}
-.kpi.pu{border-top-color:#7c3aed}.kpi.or{border-top-color:#ea580c}
-/* CARD */
-  .card{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:18px;margin-bottom:14px}
-.card h3{font-size:12px;font-weight:600;color:#374151;margin-bottom:12px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-/* TABLE */
-table{width:100%;border-collapse:collapse}
-th{text-align:left;padding:7px 10px;font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;border-bottom:1px solid #f1f5f9}
-td{padding:8px 10px;border-bottom:1px solid #f9fafb;color:#374151}
-tr:hover td{background:#fafafa}
-/* BADGE */
-.b{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px}
-.b.g{background:#dcfce7;color:#15803d}.b.y{background:#fef9c3;color:#a16207}
-.b.r{background:#fee2e2;color:#dc2626}.b.b{background:#dbeafe;color:#1d4ed8}
-.b.gr{background:#f1f5f9;color:#475569}
-/* CONTROLS */
-.ctrl{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.ctrl label{font-size:11.5px;color:#64748b;min-width:110px;flex-shrink:0}
-select{padding:5px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;cursor:pointer}
-select:focus{outline:2px solid #2563eb;border-color:transparent}
-input[type=range]{flex:1;accent-color:#2563eb;cursor:pointer}
-.cv{font-size:12px;font-weight:600;color:#2563eb;min-width:48px;text-align:right}
-/* RESULTS */
-.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.rb{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}
-.rb.hl{background:#eff6ff;border-color:#bfdbfe}
-.rb label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;margin-bottom:3px}
-.rb strong{display:block;font-size:22px;font-weight:700}
-.rb span{display:block;font-size:10px;color:#94a3b8;margin-top:2px}
-.up{color:#16a34a}.dn{color:#dc2626}.nt{color:#1e293b}
-/* STOCK BAR */
-.sb{margin-bottom:9px}
-.sb header{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
-.sb-bg{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
-.sb-fill{height:100%;border-radius:4px;transition:width .4s}
-/* CHATBOT */
-.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 120px)}
-#chat-msgs{flex:1;overflow-y:auto;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:10px;min-height:0}
-.msg{display:flex;gap:8px;margin-bottom:14px;align-items:flex-start}
-.msg.u{flex-direction:row-reverse}
-.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
-.av.ai{background:#1e3a5f;color:#fff}.av.u{background:#e2e8f0;color:#475569}
-.bbl{max-width:72%;padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.55;white-space:pre-wrap}
-.bbl.ai{background:#fff;border:1px solid #e2e8f0;border-top-left-radius:3px}
-.bbl.u{background:#1e3a5f;color:#fff;border-top-right-radius:3px}
-.sugg{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.sq{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:5px 11px;font-size:11.5px;color:#475569;cursor:pointer;transition:.15s}
-.sq:hover{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
-.inp-row{display:flex;gap:7px}
-#ci{flex:1;border:1px solid #e2e8f0;border-radius:7px;padding:9px 13px;font-size:12.5px;outline:none}
-#ci:focus{border-color:#2563eb}
-#cs{background:#1e3a5f;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.15s}
-#cs:hover{background:#1e40af}#cs:disabled{opacity:.45;cursor:default}
-.typ{display:flex;gap:3px;padding:3px 0}
-.typ span{width:6px;height:6px;background:#94a3b8;border-radius:50%;animation:b .8s infinite}
-.typ span:nth-child(2){animation-delay:.16s}.typ span:nth-child(3){animation-delay:.32s}
-@keyframes b{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-/* API NOTICE */
-.api-n{background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:11px 14px;font-size:12px;color:#92400e;margin-bottom:12px}
-.api-n input{margin-top:5px;width:100%;padding:6px 9px;border:1px solid #fde68a;border-radius:5px;font-size:12px;background:#fff;color:#1e293b}
-/* STATUS */
-.st{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:5px 10px;margin-bottom:14px}
-.std{width:6px;height:6px;border-radius:50%;background:#22c55e}
-/* ALERT BOX */
-.alrt{border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:14px}
-.alrt.or{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+:root{
+  --bg:#080c12;--bg2:#0e1420;--bg3:#151d2e;--bg4:#1e2a3d;--bg5:#243045;
+  --P:#00c853;--P2:#00e676;--P3:#003d1f;--P4:rgba(0,200,83,.08);
+  --txt:#e2eaf6;--txt2:#7a8fa8;--txt3:#4a5f7a;
+  --rd:#ff4757;--yl:#ffa502;--bl:#2979ff;--pu:#9c27b0;--cy:#00bcd4;
+  --bdr:1px solid #1a2640;--bdr2:1px solid #243050;--r:12px;--r2:8px;--r3:4px;
+  --shadow:0 8px 32px rgba(0,0,0,.6);
+  --grd:linear-gradient(135deg,#00c853,#00bcd4);
+}
+html{height:100%}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  display:flex;
+  min-height:100vh;
+  overflow:auto;
+}
+#root{display:flex;flex:1;min-height:100vh;overflow:hidden}
+
+/* ═══════════════ SIDEBAR ═══════════════ */
+.sb{width:252px;min-width:252px;background:var(--bg2);border-right:var(--bdr);display:flex;flex-direction:column;min-height:100vh;max-height:100vh;overflow:hidden;position:sticky;top:0}
+.sb-logo{padding:0 16px 16px;background:linear-gradient(160deg,#0a1628 0%,#0e1c32 100%);border-bottom:var(--bdr);flex-shrink:0}
+.sb-logo-head{display:flex;align-items:center;gap:10px;padding-top:16px;padding-bottom:10px}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--P),#00bcd4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 4px 14px rgba(0,200,83,.35)}
+.sb-logo h1{font-size:.9rem;color:var(--txt);font-weight:800;letter-spacing:1.5px;line-height:1.2}
+.sb-logo h1 span{color:var(--P)}
+.sb-logo p{font-size:.58rem;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;padding-left:46px;margin-top:-2px}
+.sb-status{display:flex;align-items:center;gap:6px;padding:5px 0 0}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--P);animation:pulse2 2s infinite;box-shadow:0 0 6px var(--P)}
+@keyframes pulse2{0%,100%{opacity:1;box-shadow:0 0 6px var(--P)}50%{opacity:.5;box-shadow:0 0 12px var(--P)}}
+.sb-status-txt{font-size:.6rem;color:var(--P);font-weight:600;letter-spacing:.5px}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto;min-height:0}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 14px 9px 18px;cursor:pointer;border-left:3px solid transparent;color:var(--txt2);font-size:.77rem;transition:all .18s;position:relative}
+.ni:hover{background:rgba(0,200,83,.04);color:var(--txt);border-left-color:rgba(0,200,83,.3)}
+.ni.act{background:linear-gradient(90deg,rgba(0,200,83,.1),transparent);border-left-color:var(--P);color:var(--P);font-weight:600}
+.ni.act::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:4px;height:18px;background:var(--P);border-radius:2px 0 0 2px;opacity:.4}
+.ni-ico{font-size:.85rem;width:18px;text-align:center;flex-shrink:0}
+
+/* ═══════════════ SIDEBAR KPI PANEL ═══════════════ */
+.sb-kpis{border-top:var(--bdr);padding:12px 14px;background:linear-gradient(160deg,#080d1a,#0b1220);flex-shrink:0}
+.sb-kpis-title{font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.sb-kpis-title::before{content:'';flex:1;height:1px;background:var(--bdr)}
+.sb-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sb-kpi-tile{background:var(--bg3);border:var(--bdr);border-radius:var(--r2);padding:8px 10px;transition:all .2s}
+.sb-kpi-tile:hover{border-color:rgba(0,200,83,.25);background:rgba(0,200,83,.04)}
+.sb-kpi-lbl{font-size:.55rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.sb-kpi-val{font-size:.85rem;font-weight:700;line-height:1.1}
+.sb-kpi-sub{font-size:.55rem;color:var(--txt3);margin-top:2px}
+
+/* ═══════════════ SIDEBAR FOOTER ═══════════════ */
+.sb-foot{padding:8px 14px;border-top:var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-foot-txt{font-size:.58rem;color:var(--txt3)}
+.sb-foot-badge{background:var(--P3);color:var(--P);padding:1px 6px;border-radius:10px;font-size:.55rem;font-weight:700}
+
+/* ═══════════════ MAIN LAYOUT ═══════════════ */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+}
+
+/* ═══════════════ TOPBAR ═══════════════ */
+.topbar{height:52px;min-height:52px;background:linear-gradient(90deg,#0b1424,#0e1828);border-bottom:var(--bdr);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:relative}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--P),transparent);opacity:.3}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-ico{width:34px;height:34px;background:var(--P4);border:1px solid rgba(0,200,83,.2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.topbar-title{font-size:.85rem;font-weight:700;color:var(--txt);letter-spacing:.3px}
+.topbar-sub{font-size:.6rem;color:var(--txt3);margin-top:1px}
+.topbar-div{width:1px;height:22px;background:var(--bdr2);margin:0 4px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.62rem;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.badge-grn{background:rgba(0,200,83,.1);color:var(--P);border:1px solid rgba(0,200,83,.2)}
+.badge-bl{background:rgba(41,121,255,.1);color:var(--bl);border:1px solid rgba(41,121,255,.2)}
+.badge-yl{background:rgba(255,165,2,.1);color:var(--yl);border:1px solid rgba(255,165,2,.2)}
+.topbar-time{font-size:.6rem;color:var(--txt3);padding:3px 8px;background:var(--bg3);border:var(--bdr);border-radius:20px}
+
+/* ═══════════════ CONTENT ═══════════════ */
+.content{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px;min-height:0}
+
+/* ═══════════════ KPI STRIP ═══════════════ */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0}
+.kpi{background:var(--bg2);border:var(--bdr);border-radius:var(--r);padding:13px 15px;position:relative;overflow:hidden;transition:all .2s;cursor:default}
+.kpi::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--kpi-c,var(--P));opacity:.7;transition:opacity .2s}
+.kpi:hover{border-color:rgba(0,200,83,.2);box-shadow:0 6px 24px rgba(0,0,0,.4);transform:translateY(-1px)}
+.kpi:hover::before{opacity:1}
+.kpi-ico{font-size:1.4rem;position:absolute;right:12px;top:12px;opacity:.12}
+.kpi-lbl{font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-weight:600}
+.kpi-val{font-size:1.55rem;font-weight:800;line-height:1;letter-spacing:-1px}
+.kpi-sub{font-size:.6rem;color:var(--txt3);margin-top:4px;display:flex;align-items:center;gap:3px}
+.kpi-trend{display:inline-flex;align-items:center;gap:2px;font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px}
+.kpi-trend.up{background:rgba(0,200,83,.12);color:var(--P)}
+.kpi-trend.dn{background:rgba(255,71,87,.12);color:var(--rd)}
+
+/* ═══════════════ GRID ═══════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ═══════════════ CARD ═══════════════ */
+.card{background:var(--bg2);border:var(--bdr);border-radius:var(--r);padding:14px;transition:all .2s}
+.card:hover{box-shadow:0 6px 28px rgba(0,0,0,.45);border-color:#1e2e4a}
+.ct{font-size:.6rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ct::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.kv{font-size:1.5rem;font-weight:700}
+.kv.grn{color:var(--P)}.kv.yl{color:var(--yl)}.kv.rd{color:var(--rd)}.kv.bl{color:var(--bl)}
+.ks{font-size:.65rem;color:var(--txt3);margin-top:3px}
+
+/* ═══════════════ CHART BOX ═══════════════ */
+.chart-box{position:relative;width:100%;height:190px;display:block}
+.chart-box.md{height:220px}
+.chart-box.lg{height:260px}
+
+/* ═══════════════ TABLE ═══════════════ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.73rem}
+th{background:var(--bg3);color:var(--txt3);text-align:left;padding:8px 10px;border-bottom:var(--bdr);font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #0f1a2a;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,200,83,.025)}
+tbody tr{transition:background .12s}
+
+/* ═══════════════ CTRL ═══════════════ */
+.ctrl{background:var(--bg3);border:var(--bdr);border-radius:var(--r);padding:12px 14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.ctrl-grp{display:flex;flex-direction:column;gap:3px}
+.ctrl-lbl{font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+select,input[type=range],input[type=number]{background:var(--bg2);border:var(--bdr);color:var(--txt);border-radius:var(--r2);padding:5px 9px;font-size:.73rem;outline:none;transition:border-color .15s}
+select:hover,select:focus{border-color:rgba(0,200,83,.4)}
+input[type=range]{padding:4px 0;accent-color:var(--P);width:130px;cursor:pointer}
+
+/* ═══════════════ MISC ═══════════════ */
+.pbar{height:4px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:4px}
+.pb-fill{height:100%;border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.62rem;font-weight:700}
+.pill-A{background:rgba(0,200,83,.12);color:#39d96a;border:1px solid rgba(0,200,83,.2)}
+.pill-B{background:rgba(0,200,83,.07);color:#7ee23a;border:1px solid rgba(0,200,83,.15)}
+.pill-C{background:rgba(255,165,2,.1);color:#ffa502;border:1px solid rgba(255,165,2,.2)}
+.pill-D{background:rgba(255,71,87,.1);color:#ff4757;border:1px solid rgba(255,71,87,.2)}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #0f1a2a}
+.mrow:last-child{border-bottom:none}
+.mk{color:var(--txt3);font-size:.73rem}.mv{font-size:.73rem;font-weight:600}
+.mv.grn{color:var(--P)}.mv.bl{color:var(--bl)}.mv.yl{color:var(--yl)}.mv.rd{color:var(--rd)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #1e2a3d;border-top-color:var(--P);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rpt-section{background:var(--bg2);border:var(--bdr);border-radius:var(--r);padding:15px}
+.rpt-section h3{color:var(--P);font-size:.8rem;margin-bottom:10px;padding-bottom:8px;border-bottom:var(--bdr);font-weight:700;letter-spacing:.3px}
+.rec-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #0f1a2a}
+.rec-item:last-child{border-bottom:none}
+.rec-num{background:linear-gradient(135deg,var(--P),#00bcd4);color:#000;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;flex-shrink:0;margin-top:1px}
+.rec-text{font-size:.73rem;color:var(--txt2);line-height:1.6}
+.rec-text strong{color:var(--txt)}
+
+/* ═══════════════ SCROLLBAR ═══════════════ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#1e2a3d;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#2a3a50}
+
+/* ═══════════════ AI AGENT ═══════════════ */
+.ai-fab{position:fixed;bottom:22px;right:22px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#00A651,#00c46a);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(0,166,81,.5);display:flex;align-items:center;justify-content:center;font-size:1.3rem;z-index:2000;transition:transform .2s,box-shadow .2s}
+.ai-fab:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(0,166,81,.7)}
+.ai-notif{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--rd);border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:700;color:#fff}
+.ai-panel{position:fixed;bottom:86px;right:22px;width:375px;height:520px;background:var(--bg2);border:var(--bdr);border-radius:16px;box-shadow:0 12px 50px rgba(0,0,0,.7);display:flex;flex-direction:column;z-index:2000;overflow:hidden;animation:slideUp .22s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ai-head{padding:13px 15px;background:linear-gradient(135deg,#060e1a,#0b1828);border-bottom:var(--bdr);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ai-avi{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--P),#00bcd4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,200,83,.3)}
+.ai-info h4{font-size:.82rem;font-weight:700;color:var(--txt)}
+.ai-info p{font-size:.6rem;color:var(--P);display:flex;align-items:center;gap:3px;margin-top:1px}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--P);animation:pulse2 2s infinite}
+.ai-x{margin-left:auto;background:none;border:1px solid var(--bdr);color:var(--txt3);cursor:pointer;font-size:.85rem;padding:4px 7px;border-radius:var(--r2);transition:all .15s}
+.ai-x:hover{color:var(--txt);background:var(--bg4);border-color:#2a3a50}
+.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ai-msg{display:flex;gap:8px;align-items:flex-end}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
+.ai-msg.ai .ai-av{background:var(--P4);color:var(--P)}
+.ai-msg.user .ai-av{background:rgba(41,121,255,.1);color:var(--bl)}
+.ai-bub{max-width:270px;padding:9px 12px;font-size:.73rem;line-height:1.55;border-radius:12px;word-break:break-word}
+.ai-msg.ai .ai-bub{background:var(--bg3);color:var(--txt);border-bottom-left-radius:3px;border:var(--bdr)}
+.ai-msg.user .ai-bub{background:rgba(41,121,255,.08);color:var(--bl);border-bottom-right-radius:3px;border:1px solid rgba(41,121,255,.15)}
+.ai-bub strong{color:var(--P)}
+.ai-typ{display:flex;gap:4px;padding:3px 0}
+.ai-typ span{width:6px;height:6px;border-radius:50%;background:var(--txt3);animation:bnc .9s infinite}
+.ai-typ span:nth-child(2){animation-delay:.2s}
+.ai-typ span:nth-child(3){animation-delay:.4s}
+@keyframes bnc{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.ai-sugs{padding:8px 12px;border-top:var(--bdr);display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0;background:var(--bg)}
+.ai-sug{background:var(--bg3);border:var(--bdr);color:var(--txt3);padding:3px 9px;border-radius:12px;font-size:.62rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ai-sug:hover{background:var(--P4);color:var(--P);border-color:rgba(0,200,83,.3)}
+.ai-inp-row{padding:10px 12px;border-top:var(--bdr);display:flex;gap:8px;flex-shrink:0}
+.ai-inp-row input{flex:1;background:var(--bg3);border:var(--bdr);color:var(--txt);border-radius:20px;padding:7px 14px;font-size:.73rem;outline:none;transition:border-color .15s}
+.ai-inp-row input:focus{border-color:rgba(0,200,83,.4);box-shadow:0 0 0 3px rgba(0,200,83,.06)}
+.ai-inp-row button{background:linear-gradient(135deg,var(--P),#00bcd4);color:#000;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 2px 10px rgba(0,200,83,.3)}
+.ai-inp-row button:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(0,200,83,.45)}
+.ai-inp-row button:disabled{background:var(--bg4);cursor:not-allowed;box-shadow:none;transform:none}
 </style>
 </head>
 <body>
-  <aside>
-  <div class="logo"><h1>OCP Simulateur</h1><p>Commercial 2025</p></div>
-  <div class="nav-sec">Vue generale</div>
-  <div class="nav-btn on" onclick="go('dashboard',this)"><span class="dot" style="background:#60a5fa"></span>Tableau de bord</div>
-  <div class="nav-sec">Modules ML</div>
-  <div class="nav-btn" onclick="go('m1',this)"><span class="dot" style="background:#60a5fa"></span>M1 — Demande</div>
-  <div class="nav-btn" onclick="go('m2',this)"><span class="dot" style="background:#4ade80"></span>M2 — Prix optimal</div>
-  <div class="nav-btn" onclick="go('m3',this)"><span class="dot" style="background:#fb923c"></span>M3 — Production</div>
-  <div class="nav-btn" onclick="go('m4',this)"><span class="dot" style="background:#c084fc"></span>M4 — Profit</div>
-  <div class="nav-sec">Analyse</div>
-  <div class="nav-btn" onclick="go('scenarios',this)"><span class="dot" style="background:#34d399"></span>Scenarios what-if</div>
-  <div class="nav-btn" onclick="go('stocks',this)"><span class="dot" style="background:#f472b6"></span>Stocks MP</div>
-  <div class="nav-btn" onclick="go('chatbot',this)"><span class="dot" style="background:#fbbf24"></span>Chatbot IA</div>
-  <div class="nav-sec">Outils</div>
-  <div class="nav-btn" onclick="go('previsions',this)"><span class="dot" style="background:#a78bfa"></span>Previsions 2026</div>
-  <div class="nav-btn" onclick="exportPDF()"><span class="dot" style="background:#f87171"></span>Exporter PDF</div>
-  <div class="nav-footer">537 transactions · 7 produits · 2025</div>
-</aside>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useMemo}=React;
 
-<main>
+/* DATA */
+const MAT=[
+  {id:'M1',n:'Soufre (Ssol)',short:'Ssol',cj:247.93,p:105,v:0.18,cat:'Pétrole',col:'#58A6FF'},
+  {id:'M2',n:'Ammoniac (NH3)',short:'NH3',cj:97.23,p:380,v:0.25,cat:'Engrais',col:'#3FB950'},
+  {id:'M3',n:'Amine',short:'Amine',cj:0.54,p:2800,v:0.12,cat:'Chimique',col:'#D29922'},
+  {id:'M4',n:'Fuel',short:'Fuel',cj:6.42,p:8.5,v:0.22,cat:'Pétrole',col:'#F85149'},
+  {id:'M5',n:'K09',short:'K09',cj:9.14,p:360,v:0.15,cat:'Chimique',col:'#BC8CFF'},
+  {id:'M6',n:'Ac. Phosphorique',short:'H3PO4',cj:40,p:350,v:0.14,cat:'Chimique',col:'#FFA657'},
+  {id:'M7',n:'Granulation',short:'Gran.',cj:427.02,p:325,v:0.11,cat:'Autre',col:'#00A651'},
+];
+const FOUR=[
+  {id:'F1',n:'ADNOC',pays:'UAE',fl:'AE',pb:105,del:33,fib:97.1,esg:8.58,rp:3,cap:1689600},
+  {id:'F2',n:'Afriquia',pays:'Maroc',fl:'MA',pb:108,del:44,fib:94.7,esg:10,rp:5,cap:305424},
+  {id:'F3',n:'Aramco',pays:'Arabie S.',fl:'SA',pb:102,del:29,fib:85.5,esg:7.81,rp:4,cap:1795236},
+  {id:'F4',n:'BASF',pays:'Allemagne',fl:'DE',pb:112,del:25,fib:92.3,esg:9.13,rp:1,cap:122448},
+  {id:'F5',n:'Yara',pays:'Norvège',fl:'NO',pb:110,del:28,fib:96.4,esg:10,rp:1,cap:482040},
+  {id:'F6',n:'CF Industries',pays:'USA',fl:'US',pb:107,del:41,fib:93.7,esg:8.8,rp:2,cap:395196},
+];
+const PHASES=[
+  {id:0,ico:'📊',lbl:'Dashboard'},{id:1,ico:'📦',lbl:'EOQ Wilson'},
+  {id:2,ico:'🏭',lbl:'Fournisseurs'},{id:3,ico:'🎯',lbl:'Scénarios'},
+  {id:4,ico:'🎲',lbl:'Monte Carlo'},{id:5,ico:'🤖',lbl:'Prévisions ML'},
+  {id:6,ico:'⚠️',lbl:'Gestion Risques'},{id:7,ico:'📋',lbl:'Rapport'},
+];
 
-<!-- DASHBOARD -->
-<div class="pg on" id="pg-dashboard">
-  <div class="ph"><h1>Tableau de bord global</h1><p>Jan–Dec 2025 · OCP Jorf Lasfar · Direction Controle de Gestion</p></div>
-  <div class="kpis">
-    <div class="kpi bl"><label>CA Net-Net</label><strong>218.8 M</strong><span>USD · 2025</span></div>
-    <div class="kpi gr"><label>Volume total</label><strong>601 903 t</strong><span>7 produits</span></div>
-    <div class="kpi pu"><label>Marge nette moy.</label><strong>19.6%</strong><span>537 transactions</span></div>
-    <div class="kpi or"><label>Profit net</label><strong>50.7 M</strong><span>USD · 2025</span></div>
-  </div>
-  <div class="g2">
-    <div class="card"><h3>Ventes par produit (tonnes)</h3><div style="position:relative;height:210px"><canvas id="ch-prod"></canvas></div></div>
-    <div class="card"><h3>Marge nette par produit (%)</h3><div style="position:relative;height:210px"><canvas id="ch-marge"></canvas></div></div>
-  </div>
-  <div class="card"><h3>Evolution mensuelle du CA (USD)</h3><div style="position:relative;height:165px"><canvas id="ch-mois"></canvas></div></div>
-  <div class="g2">
-    <div class="card"><h3>Performance par produit</h3>
-      <table><thead><tr><th>Produit</th><th>Volume (t)</th><th>CA (M USD)</th><th>Marge</th><th>Profit</th></tr></thead>
-      <tbody id="tb-prod"></tbody></table>
-    </div>
-    <div class="card"><h3>CA par marche</h3><div style="position:relative;height:195px"><canvas id="ch-pays"></canvas></div></div>
-  </div>
-</div>
-
-<!-- M1 -->
-<div class="pg" id="pg-m1">
-  <div class="ph"><h1>M1 — Prevision de la demande</h1><p>Modele XGBoost · Simule l'impact du prix et des promotions sur le volume vendu</p></div>
-  <div class="st"><div class="std"></div>Modele XGBoost entrainement · R² = 0.84 · MAE = 98 tonnes</div>
-  <div class="g2">
-    <div class="card">
-      <h3>Parametres</h3>
-      <div class="ctrl"><label>Produit</label><select id="m1p" onchange="cM1()"></select></div>
-      <div class="ctrl"><label>Segment</label><select id="m1s" onchange="cM1()"><option>Local</option><option>Export</option><option>Distributeur</option></select></div>
-      <div class="ctrl"><label>Mois</label><select id="m1m" onchange="cM1()"></select></div>
-      <hr style="border:none;border-top:1px solid #f1f5f9;margin:10px 0">
-      <h3>Leviers what-if</h3>
-      <div class="ctrl"><label>Variation prix (%)</label><input type="range" id="m1px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m1pxv').textContent=(this.value>0?'+':'')+this.value+'%';cM1()"><span class="cv" id="m1pxv">0%</span></div>
-      <div class="ctrl"><label>Promotion</label><select id="m1pr" onchange="cM1()"><option value="0">Non</option><option value="1">Oui (+12% demande)</option></select></div>
-      <div class="ctrl"><label>Saison</label><select id="m1sa" onchange="cM1()"><option>Printemps T2</option><option>Ete T3</option><option>Automne T4</option><option>Hiver T1</option></select></div>
-    </div>
-    <div>
-      <div class="rg">
-        <div class="rb hl"><label>Demande predite</label><strong class="nt" id="m1pred">—</strong><span>tonnes</span></div>
-        <div class="rb"><label>Historique</label><strong class="nt" id="m1hist">—</strong><span>tonnes</span></div>
-        <div class="rb"><label>Ecart</label><strong id="m1dlt">—</strong><span id="m1dlp">—</span></div>
-      </div>
-      <div class="card"><h3>Courbe demande vs prix</h3><div style="position:relative;height:180px"><canvas id="ch-m1"></canvas></div></div>
-      <div class="card" id="m1-box" style="background:#f0fdf4;border-color:#bbf7d0"><p id="m1-txt" style="font-size:12px;color:#166534">Modifier les parametres.</p></div>
-    </div>
-  </div>
-</div>
-
-<!-- M2 -->
-<div class="pg" id="pg-m2">
-  <div class="ph"><h1>M2 — Optimisation du prix</h1><p>Profit = (Prix − Cout) × Demande · Trouver le prix qui maximise le profit</p></div>
-  <div class="g2">
-    <div class="card">
-      <h3>Simulateur de prix</h3>
-      <div class="ctrl"><label>Produit</label><select id="m2p" onchange="cM2()"></select></div>
-      <div class="ctrl"><label>Prix teste (USD/t)</label><input type="range" id="m2px" min="200" max="700" value="500" step="5" oninput="document.getElementById('m2pxv').textContent=this.value+' USD';cM2()"><span class="cv" id="m2pxv">500 USD</span></div>
-      <div class="ctrl"><label>Demande base (t)</label><input type="range" id="m2dm" min="500" max="50000" value="5000" step="500" oninput="document.getElementById('m2dmv').textContent=Number(this.value).toLocaleString('fr-FR')+' t';cM2()"><span class="cv" id="m2dmv">5 000 t</span></div>
-      <div class="rg" style="margin-top:14px">
-        <div class="rb"><label>Cout prod.</label><strong class="nt" id="m2cout">—</strong><span>USD/t</span></div>
-        <div class="rb"><label>Marge unit.</label><strong id="m2marg">—</strong><span>USD/t</span></div>
-        <div class="rb hl"><label>Profit total</label><strong id="m2prof">—</strong><span>USD</span></div>
-      </div>
-    </div>
-    <div class="card"><h3>Courbe profit vs prix</h3><div style="position:relative;height:250px"><canvas id="ch-m2"></canvas></div></div>
-  </div>
-  <div class="card"><h3>Prix optimaux — tous les produits</h3>
-    <table><thead><tr><th>Produit</th><th>Cout prod.</th><th>Bornes prix</th><th>Prix optimal</th><th>Marge unit.</th><th>% Marge</th></tr></thead>
-    <tbody id="tb-prix"></tbody></table>
-  </div>
-</div>
-
-<!-- M3 -->
-<div class="pg" id="pg-m3">
-  <div class="ph"><h1>M3 — Planification Production / Achat</h1><p>Programmation Lineaire · Maximiser profit sous contraintes : capacite machine · stock MP · demande</p></div>
-  <div class="alrt or"><strong>Modele LP :</strong> Max Profit = Revenus − Cout_production − Cout_achat_MP &nbsp;|&nbsp; <strong>Contraintes :</strong> Prod ≤ Capacite · Stock ≥ Securite · Prod ≥ Demande</div>
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-    <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Mois :</label><select id="m3m" onchange="cM3()"></select></div>
-    <span class="b g">Statut LP : Optimal</span>
-  </div>
-  <div class="g3">
-    <div>
-      <div class="card"><h3>Plan de production</h3>
-        <table><thead><tr><th>Produit</th><th>Demande</th><th>Prod LP</th><th>Capacite</th><th>Taux</th><th>Statut</th></tr></thead>
-        <tbody id="tb-m3"></tbody></table>
-      </div>
-      <div class="card"><h3>Production vs Capacite</h3><div style="position:relative;height:185px"><canvas id="ch-m3"></canvas></div></div>
-    </div>
-    <div>
-      <div class="card"><h3>Stocks MP</h3><div id="mp-stocks"></div></div>
-      <div class="card"><h3>Signaux d'achat</h3><div id="mp-signals"></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- M4 -->
-<div class="pg" id="pg-m4">
-  <div class="ph"><h1>M4 — Simulation du profit</h1><p>Modele XGBoost · Predit la marge nette en fonction des decisions commerciales</p></div>
-  <div class="st"><div class="std"></div>Modele XGBoost · R² = 0.87 · Precision ±1.2 pts</div>
-  <div class="g2">
-    <div class="card">
-      <h3>Parametres</h3>
-      <div class="ctrl"><label>Produit</label><select id="m4p" onchange="cM4()"></select></div>
-      <div class="ctrl"><label>Segment</label><select id="m4s" onchange="cM4()"><option>Local</option><option>Export</option><option>Distributeur</option></select></div>
-      <div class="ctrl"><label>Mois</label><select id="m4m" onchange="cM4()"></select></div>
-      <hr style="border:none;border-top:1px solid #f1f5f9;margin:10px 0">
-      <h3>Leviers</h3>
-      <div class="ctrl"><label>Prix +/- (%)</label><input type="range" id="m4px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m4pxv').textContent=(this.value>0?'+':'')+this.value+'%';cM4()"><span class="cv" id="m4pxv">0%</span></div>
-      <div class="ctrl"><label>Volume +/- (%)</label><input type="range" id="m4vl" min="-20" max="20" value="0" step="1" oninput="document.getElementById('m4vlv').textContent=(this.value>0?'+':'')+this.value+'%';cM4()"><span class="cv" id="m4vlv">0%</span></div>
-      <div class="ctrl"><label>Promotion</label><select id="m4pr" onchange="cM4()"><option value="0">Non</option><option value="1">Oui (+8%)</option></select></div>
-      <div class="ctrl"><label>Remise (%)</label><input type="range" id="m4rm" min="0" max="15" value="2" step="0.5" oninput="document.getElementById('m4rmv').textContent=this.value+'%';cM4()"><span class="cv" id="m4rmv">2%</span></div>
-    </div>
-    <div>
-      <div class="rg">
-        <div class="rb hl"><label>Profit predit</label><strong id="m4pred">—</strong><span>% marge nette</span></div>
-        <div class="rb"><label>Profit USD</label><strong class="nt" id="m4usd">—</strong><span>USD estime</span></div>
-        <div class="rb"><label>Vs historique</label><strong id="m4dlt">—</strong><span id="m4dlb">base: —%</span></div>
-      </div>
-      <div class="card"><h3>Jauge de rentabilite</h3><div id="m4jauge"></div></div>
-      <div class="card"><h3>Analyse</h3><div id="m4analyse" style="font-size:12px;color:#475569;line-height:1.6"></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- SCENARIOS -->
-<div class="pg" id="pg-scenarios">
-  <div class="ph"><h1>Scenarios What-If</h1><p>Comparer 3 scenarios et leur impact sur le profit</p></div>
-  <div class="card" style="margin-bottom:14px">
-    <div style="display:flex;gap:14px;flex-wrap:wrap">
-      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Produit :</label><select id="scp" onchange="cSC()"></select></div>
-      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Mois :</label><select id="scm" onchange="cSC()"></select></div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px">
-    <div class="card" style="border-top:3px solid #94a3b8"><h3>Base</h3><div style="font-size:11px;color:#64748b">Prix 0% · Vol 0% · No promo<br><span style="margin-top:4px;display:block;color:#94a3b8">Reference</span></div></div>
-    <div class="card" style="border-top:3px solid #2563eb">
-      <h3>Scenario 1</h3>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s1px" min="-20" max="20" value="5" step="1" oninput="document.getElementById('s1pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s1pxv" style="min-width:36px">+5%</span></div>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s1vl" min="-20" max="20" value="0" step="1" oninput="document.getElementById('s1vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s1vlv" style="min-width:36px">0%</span></div>
-      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s1pr" onchange="cSC()" style="font-size:11px"><option value="0">Non</option><option value="1" selected>Oui</option></select></div>
-    </div>
-    <div class="card" style="border-top:3px solid #16a34a">
-      <h3>Scenario 2</h3>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s2px" min="-20" max="20" value="-5" step="1" oninput="document.getElementById('s2pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s2pxv" style="min-width:36px">-5%</span></div>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s2vl" min="-20" max="20" value="10" step="1" oninput="document.getElementById('s2vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s2vlv" style="min-width:36px">+10%</span></div>
-      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s2pr" onchange="cSC()" style="font-size:11px"><option value="0" selected>Non</option><option value="1">Oui</option></select></div>
-    </div>
-    <div class="card" style="border-top:3px solid #ea580c">
-      <h3>Scenario 3</h3>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Prix</label><input type="range" id="s3px" min="-20" max="20" value="0" step="1" oninput="document.getElementById('s3pxv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s3pxv" style="min-width:36px">0%</span></div>
-      <div class="ctrl" style="margin-bottom:6px"><label style="min-width:50px">Volume</label><input type="range" id="s3vl" min="-20" max="20" value="-10" step="1" oninput="document.getElementById('s3vlv').textContent=(this.value>0?'+':'')+this.value+'%';cSC()"><span class="cv" id="s3vlv" style="min-width:36px">-10%</span></div>
-      <div class="ctrl" style="margin-bottom:0"><label style="min-width:50px">Promo</label><select id="s3pr" onchange="cSC()" style="font-size:11px"><option value="0" selected>Non</option><option value="1">Oui</option></select></div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px" id="sc-res"></div>
-  <div class="card"><h3>Comparaison profit (%)</h3><div style="position:relative;height:200px"><canvas id="ch-sc"></canvas></div></div>
-</div>
-
-<!-- STOCKS -->
-<div class="pg" id="pg-stocks">
-  <div class="ph"><h1>Stocks Matieres Premieres</h1><p>Niveaux de stock · Alertes · Signaux d'achat · Donnees FACT_STOCKS</p></div>
-  <div class="g2">
-    <div class="card"><h3>Niveaux de stock (% vs maximum)</h3><div id="all-stocks"></div></div>
-    <div class="card"><h3>Tableau des achats 2025</h3>
-      <table><thead><tr><th>Matiere</th><th>Prix moy (USD/t)</th><th>Qte totale (t)</th><th>Nb achats</th></tr></thead>
-      <tbody id="tb-achats"></tbody></table>
-    </div>
-  </div>
-</div>
-
-<!-- CHATBOT -->
-<div class="pg" id="pg-chatbot">
-  <div class="ph"><h1>Chatbot IA — Assistant OCP</h1><p>Propulse par Claude · Repond aux questions sur les donnees OCP 2025</p></div>
-  <div class="api-n" id="api-n">
-    <strong>Cle API Groq requise (100% gratuit).</strong> Creer un compte sur <a href="https://console.groq.com" target="_blank" style="color:#92400e">console.groq.com</a> → API Keys → Create Key
-    <input type="password" id="apikey" placeholder="gsk_xxxxxxxxxxxxxxxxxx" oninput="saveKey()">
-  </div>
-  <div class="chat-wrap">
-    <div class="sugg" id="sugg">
-      <button class="sq" onclick="useS(this)">Quel produit a la meilleure marge ?</button>
-      <button class="sq" onclick="useS(this)">Compare Maroc et Inde.</button>
-      <button class="sq" onclick="useS(this)">Comment ameliorer le profit du NPS ?</button>
-      <button class="sq" onclick="useS(this)">Analyse la tendance mensuelle.</button>
-      <button class="sq" onclick="useS(this)">Quels marches ont le plus fort potentiel ?</button>
-      <button class="sq" onclick="useS(this)">Strategie de prix pour le DAP ?</button>
-    </div>
-    <div id="chat-msgs"></div>
-    <div class="inp-row">
-      <input type="text" id="ci" placeholder="Pose ta question sur les donnees OCP 2025..." onkeydown="if(event.key==='Enter')sendChat()">
-      <button id="cs" onclick="sendChat()">Envoyer</button>
-    </div>
-  </div>
-</div>
-<!-- PREVISIONS 2026 -->
-<div class="pg" id="pg-previsions">
-  <div class="ph"><h1>Previsions 2026</h1><p>Forecasting base sur les tendances 2025 · Projection 12 mois · Intervalles de confiance</p></div>
-
-  <div class="kpis">
-    <div class="kpi bl"><label>CA prevu 2026</label><strong id="prev-ca">—</strong><span id="prev-ca-delta">vs 2025</span></div>
-    <div class="kpi gr"><label>Volume prevu 2026</label><strong id="prev-vol">—</strong><span id="prev-vol-delta">vs 2025</span></div>
-    <div class="kpi pu"><label>Marge prevue 2026</label><strong id="prev-marge">—</strong><span>projection</span></div>
-    <div class="kpi or"><label>Profit prevu 2026</label><strong id="prev-profit">—</strong><span id="prev-profit-delta">vs 2025</span></div>
-  </div>
-
-  <div class="card" style="margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Produit :</label>
-        <select id="prev-produit" onchange="buildPrevisions()">
-          <option value="ALL">Tous les produits</option>
-        </select>
-      </div>
-      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Croissance marche :</label>
-        <input type="range" id="prev-growth" min="-10" max="20" value="3" step="1" oninput="document.getElementById('prev-gv').textContent=(this.value>0?'+':'')+this.value+'%';buildPrevisions()">
-        <span class="cv" id="prev-gv">+3%</span>
-      </div>
-      <div class="ctrl" style="margin:0"><label style="min-width:auto;margin-right:8px">Variation prix :</label>
-        <input type="range" id="prev-prix" min="-10" max="15" value="2" step="1" oninput="document.getElementById('prev-pv').textContent=(this.value>0?'+':'')+this.value+'%';buildPrevisions()">
-        <span class="cv" id="prev-pv">+2%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <h3>Evolution CA mensuel — 2025 reel vs 2026 prevu (M USD)</h3>
-      <div style="position:relative;height:240px"><canvas id="ch-prev-ca"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Evolution volume mensuel — 2025 reel vs 2026 prevu (tonnes)</h3>
-      <div style="position:relative;height:240px"><canvas id="ch-prev-vol"></canvas></div>
-    </div>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <h3>Previsions par produit — CA 2026 estime</h3>
-      <table>
-        <thead><tr><th>Produit</th><th>CA 2025 reel</th><th>CA 2026 prevu</th><th>Evolution</th><th>Confiance</th></tr></thead>
-        <tbody id="tb-prev-prod"></tbody>
-      </table>
-    </div>
-    <div class="card">
-      <h3>Previsions marge nette 2026 (%)</h3>
-      <div style="position:relative;height:230px"><canvas id="ch-prev-marge"></canvas></div>
-    </div>
-  </div>
-
-  <div class="card" style="background:#fffbeb;border-color:#fde68a">
-    <h3 style="color:#92400e">Hypotheses du modele de prevision</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;color:#78350f">
-      <div><strong>Methode :</strong> Regression lineaire sur tendances 2025 + effets saisonniers detailles</div>
-      <div><strong>Saisonnalite :</strong> T2 (Avr-Jun) pic +28% · T1 et T4 creux -12%</div>
-      <div><strong>Croissance marche :</strong> Parametre ajustable (-10% a +20%)</div>
-      <div><strong>Intervalle confiance :</strong> ±8% base sur la volatilite mensuelle 2025</div>
-    </div>
-  </div>
-</div>
-
-</main>
-
-<script>
-// ═══════════════════════════════════════════════════════
-// DATA REELLES OCP 2025
-// ═══════════════════════════════════════════════════════
-const D = {
-  prods: [
-    {n:"DAP",   q:46967,  ca:24220893, m:29.1, p:7908427,  cout:324.53, bmin:450, bmax:650},
-    {n:"MAP",   q:41248,  ca:20396806, m:25.9, p:6150383,  cout:324.53, bmin:440, bmax:620},
-    {n:"NPK",   q:9088,   ca:4204954,  m:79.3, p:3569683,  cout:291.70, bmin:400, bmax:580},
-    {n:"NPS",   q:127200, ca:39508329, m:-0.4, p:-367682,  cout:278.00, bmin:280, bmax:400},
-    {n:"TSP",   q:330000, ca:115024511,m:24.1, p:33038745, cout:225.00, bmin:300, bmax:440},
-    {n:"ASP",   q:42000,  ca:12504354, m:-1.8, p:-203443,  cout:272.00, bmin:270, bmax:380},
-    {n:"DCP",   q:5400,   ca:2937481,  m:18.0, p:591829,   cout:408.00, bmin:480, bmax:680},
-  ],
-  mois: [
-    {l:"Jan",ca:15259527,v:42134,m:19.4},{l:"Fev",ca:15246904,v:42134,m:19.8},
-    {l:"Mar",ca:19649981,v:54171,m:19.3},{l:"Avr",ca:21983625,v:60190,m:19.0},
-    {l:"Mai",ca:21858128,v:60190,m:18.8},{l:"Jun",ca:19598109,v:54171,m:19.0},
-    {l:"Jul",ca:17619127,v:48152,m:20.1},{l:"Aou",ca:17623052,v:48152,m:20.3},
-    {l:"Sep",ca:17540307,v:48152,m:19.9},{l:"Oct",ca:19593230,v:54171,m:19.5},
-    {l:"Nov",ca:17620324,v:48152,m:20.4},{l:"Dec",ca:15205012,v:42134,m:19.9},
-  ],
-  pays: [
-    {p:"Maroc",ca:123124973,v:325353},{p:"Inde",ca:50532497,v:149332},
-    {p:"Nigeria",ca:21722546,v:64747},{p:"Egypte",ca:19212359,v:53383},
-    {p:"Suisse",ca:4204954,v:9088},
-  ],
-  stocks: [
-    {n:"Ssol",s:6352.79,min:4958.69,max:11157.06,sig:"ACHETER — Prix BAS",c:"g"},
-    {n:"NH3",s:2613.07,min:1944.5,max:4375.13,sig:"Surveiller — Normal",c:"y"},
-    {n:"Amine",s:13.96,min:10.74,max:24.16,sig:"ACHETER URGENT",c:"r"},
-    {n:"Fuel",s:183.51,min:128.4,max:288.9,sig:"ACHETER — Prix BAS",c:"g"},
-    {n:"K09",s:242.74,min:182.8,max:411.3,sig:"Surveiller — Normal",c:"y"},
-    {n:"Additifs",s:15942,min:10000,max:22500,sig:"Surveiller — Normal",c:"y"},
-    {n:"Phosphorique",s:1039.99,min:800,max:1800,sig:"Surveiller — Normal",c:"y"},
-    {n:"Sulfurique",s:1352.84,min:800,max:1800,sig:"Surveiller — Normal",c:"y"},
-    {n:"BG-Standard",s:132960,min:74000,max:166500,sig:"OK — Stock eleve",c:"g"},
-    {n:"Zn",s:7.63,min:5.2,max:11.7,sig:"Surveiller — Normal",c:"y"},
-  ],
-  achats: [
-    {n:"Ssol",p:106.65,q:91911,nb:24},{n:"NH3",p:349.08,q:35161,nb:24},
-    {n:"Fuel",p:8.21,q:2380,nb:31},{n:"K09",p:315.05,q:3410,nb:25},
-    {n:"K",p:312.98,q:1934,nb:23},{n:"Amine",p:2344.71,q:201,nb:19},
-    {n:"Zn",p:2333.81,q:95,nb:25},
-  ],
-  mois_list: ["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06",
-              "2025-07","2025-08","2025-09","2025-10","2025-11","2025-12"],
-  caps: {DAP:33000,MAP:30000,NPK:14000,NPS:38000,TSP:100000,ASP:14000,DCP:5000},
-};
-
-const fmt = n => isNaN(n)?'—':new Intl.NumberFormat('fr-FR').format(Math.round(n));
-const fmtM = n => (n/1e6).toFixed(1)+'M';
-let CH = {};
-const dc = id => { if(CH[id]){CH[id].destroy();delete CH[id]} };
-
-// ═══════════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════════
-function go(id, el) {
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('pg-'+id).classList.add('on');
-  el.classList.add('on');
+/* FORMULAS */
+const eoq=(D,S,H)=>Math.sqrt(2*D*S/H);
+const ss=(z,sig,lt)=>z*sig*Math.sqrt(lt);
+const rop=(D,lt,s)=>D*lt+s;
+const tc=(D,Q,S,H)=>(D/Q)*S+(Q/2)*H;
+const Z_MAP={90:1.28,95:1.645,99:1.96,99.9:2.326};
+function scoreF(f,w){
+  const ww=w||{px:.30,dl:.25,fb:.30,es:.10,rp:.05};
+  return Math.min(100,
+    Math.max(0,100-((f.pb-100)/20*100))*ww.px+
+    Math.max(0,100-((f.del-20)/30*100))*ww.dl+
+    f.fib*ww.fb+f.esg*10*ww.es+
+    Math.max(0,100-(f.rp-1)*20)*ww.rp);
 }
-  // ═══════════════════════════════════════════════════════
-// INIT SELECTS
-// ═══════════════════════════════════════════════════════
-function initSelects() {
-  const noms = D.prods.map(p=>p.n);
-  ['m1p','m2p','m4p','scp'].forEach(id=>{
-    const s=document.getElementById(id);
-    if(!s)return;
-    noms.forEach(n=>{ const o=document.createElement('option');o.value=n;o.textContent=n;s.appendChild(o) });
-  });
-  ['m1m','m4m','scm','m3m'].forEach(id=>{
-    const s=document.getElementById(id);
-    if(!s)return;
-    D.mois_list.forEach((m,i)=>{ const o=document.createElement('option');o.value=m;o.textContent=m;if(i===5)o.selected=true;s.appendChild(o) });
-  });
+function clsF(s){return s>=85?'A':s>=70?'B':s>=55?'C':'D'}
+function riskF(g,o,f,d,p){return g*.25+o*.30+f*.20+d*.15+p*.10}
+function clsR(r){return r<30?'Faible':r<60?'Modéré':'Élevé'}
+function bm(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+/* CHART HOOK — uses setTimeout to wait for layout */
+function useChart(ref,mkCfg,deps){
+  const inst=useRef(null);
+  useEffect(()=>{
+    const t=setTimeout(()=>{
+      if(!ref.current)return;
+      if(inst.current){inst.current.destroy();inst.current=null;}
+      try{inst.current=new Chart(ref.current,mkCfg());}catch(e){console.warn(e);}
+    },80);
+    return()=>{clearTimeout(t);if(inst.current){inst.current.destroy();inst.current=null;}};
+  },deps);
 }
 
-// ═══════════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════════
-function buildDash() {
-  const C = '#1e3a5f', G = '#16a34a';
+/* ════════════════════════════════════
+   AI AGENT ENGINE
+════════════════════════════════════ */
+function aiReply(input){
+  const q=input.toLowerCase().trim();
+  const scored=FOUR.map(f=>({...f,s:+scoreF(f).toFixed(1)})).sort((a,b)=>b.s-a.s);
 
-  dc('prod'); CH['prod'] = new Chart(document.getElementById('ch-prod'),{type:'bar',
-    data:{labels:D.prods.map(p=>p.n),datasets:[{data:D.prods.map(p=>p.q),backgroundColor:C,borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}}}
-  });
+  if(/^(bonjour|salut|hello|hi|bonsoir|salam)/.test(q))
+    return `Bonjour! Je suis **OCP AI**, votre assistant Procurement Intelligence.\n\nJe peux vous aider:\n• Calculs **EOQ/SS/ROP** par matière\n• **Classement** fournisseurs\n• Analyse des **scénarios** et économies\n• Évaluation des **risques**\n• Explication des **formules**\n\nQue voulez-vous analyser?`;
 
-  dc('marge'); CH['marge'] = new Chart(document.getElementById('ch-marge'),{type:'bar',
-    data:{labels:D.prods.map(p=>p.n),datasets:[{data:D.prods.map(p=>p.m),backgroundColor:D.prods.map(p=>p.m>0?G:'#dc2626'),borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%',font:{size:10}}}}}
-  });
+  const mf=MAT.find(m=>q.includes(m.short.toLowerCase())||q.includes(m.n.toLowerCase().split(' ')[0])||q.includes((m.n.toLowerCase().match(/\(([^)]+)\)/)||[])[1]||'__'));
 
-  dc('mois'); CH['mois'] = new Chart(document.getElementById('ch-mois'),{type:'line',
-    data:{labels:D.mois.map(m=>m.l),datasets:[{data:D.mois.map(m=>m.ca),borderColor:C,backgroundColor:'rgba(30,58,95,.07)',tension:.4,fill:true,pointRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{callback:v=>fmtM(v),font:{size:10}}}}}
-  });
-
-  dc('pays'); CH['pays'] = new Chart(document.getElementById('ch-pays'),{type:'doughnut',
-    data:{labels:D.pays.map(p=>p.p),datasets:[{data:D.pays.map(p=>p.ca),backgroundColor:['#1e3a5f','#2563eb','#16a34a','#ea580c','#7c3aed'],borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}
-  });
-
-  document.getElementById('tb-prod').innerHTML = D.prods.map(p=>`
-    <tr><td><strong>${p.n}</strong></td><td>${fmt(p.q)} t</td><td>${fmtM(p.ca)}</td>
-    <td><span class="b ${p.m>20?'g':p.m>0?'y':'r'}">${p.m}%</span></td>
-    <td class="${p.p>0?'up':'dn'}">${p.p>0?'':'-'}${fmtM(Math.abs(p.p))}</td></tr>`).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-// M1 — DEMANDE
-// ═══════════════════════════════════════════════════════
-function cM1() {
-  const pn = document.getElementById('m1p').value;
-  const vp = parseInt(document.getElementById('m1px').value)/100;
-  const pr = parseInt(document.getElementById('m1pr').value);
-  const sa = document.getElementById('m1sa').value;
-  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
-  const hist = prod.q/12;
-  const pred = Math.max(0, hist * Math.pow(1+vp,-1.3) * (pr?1.12:1) * (sa.includes('T2')||sa.includes('T1')?1.08:sa.includes('T3')?0.93:1));
-  const delta = pred-hist, dp = ((delta/hist)*100).toFixed(1);
-  document.getElementById('m1pred').textContent = fmt(pred);
-  document.getElementById('m1hist').textContent = fmt(hist);
-  const de = document.getElementById('m1dlt');
-  de.textContent = (delta>=0?'+':'')+fmt(delta);
-  de.className = delta>=0?'up':'dn';
-  document.getElementById('m1dlp').textContent = (dp>0?'+':'')+dp+'%';
-  document.getElementById('m1-txt').textContent = delta>100?`La demande devrait augmenter de ${fmt(delta)} t (+${dp}%) avec ces parametres.`:delta<-100?`Attention : baisse potentielle de ${fmt(Math.abs(delta))} t (${dp}%).`:`Demande stable (ecart : ${fmt(delta)} t).`;
-  const pref = prod.ca/prod.q;
-  const pts = [], dems = [];
-  for(let p=prod.bmin;p<=prod.bmax;p+=(prod.bmax-prod.bmin)/30){pts.push(Math.round(p));dems.push(Math.round(hist*Math.pow(pref/p,1.3)))}
-  dc('m1'); CH['m1'] = new Chart(document.getElementById('ch-m1'),{type:'line',
-    data:{labels:pts,datasets:[{data:dems,borderColor:'#2563eb',tension:.4,fill:false,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Prix USD/t',font:{size:10}}},y:{ticks:{font:{size:10}}}}}
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// M2 — PRIX
-// ═══════════════════════════════════════════════════════
-function cM2() {
-  const pn = document.getElementById('m2p').value;
-  const px = parseInt(document.getElementById('m2px').value);
-  const dm = parseInt(document.getElementById('m2dm').value);
-  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
-  document.getElementById('m2px').min = prod.bmin;
-  document.getElementById('m2px').max = prod.bmax;
-  const marg = px - prod.cout;
-  const dem = dm * Math.pow(prod.bmin/px, 1.2);
-  const prof = marg * dem;
-  document.getElementById('m2cout').textContent = prod.cout+' USD';
-  document.getElementById('m2marg').textContent = Math.round(marg)+' USD';
-  document.getElementById('m2marg').className = marg>=0?'up':'dn';
-  document.getElementById('m2prof').textContent = fmt(prof)+' USD';
-  document.getElementById('m2prof').className = prof>=0?'up':'dn';
-  const pts=[],prs=[];
-  let bp=-1e9,bpx=prod.bmin;
-  for(let p=prod.bmin;p<=prod.bmax;p+=(prod.bmax-prod.bmin)/50){
-    const pr=Math.round(p),d=dm*Math.pow(prod.bmin/pr,1.2),pf=(pr-prod.cout)*d;
-    pts.push(pr);prs.push(Math.round(pf));
-    if(pf>bp){bp=pf;bpx=pr}
+  if(mf&&(q.includes('eoq')||q.includes('quantit')||q.includes('commande')||q.includes('optimal'))){
+    const D=mf.cj*365,S=500,H=mf.p*mf.v,Q=eoq(D,S,H);
+    const SS=ss(1.645,mf.cj*.15,7),ROP=rop(mf.cj,7,SS),TC=tc(D,Q,S,H);
+    return `**EOQ — ${mf.n}**\n\nQ* = **${Q.toFixed(0)} T** · SS = **${SS.toFixed(0)} T** · ROP = **${ROP.toFixed(0)} T**\n\n• Demande D = ${D.toFixed(0)} T/an\n• H = ${H.toFixed(2)} MAD/T/an\n• Coût total = **${(TC/1e3).toFixed(1)} k MAD/an**\n• Fréquence = ${(D/Q).toFixed(1)} cmd/an\n\nSimulez interactivement dans **EOQ Wilson**.`;
   }
-  dc('m2'); CH['m2'] = new Chart(document.getElementById('ch-m2'),{type:'line',
-    data:{labels:pts,datasets:[{data:prs,borderColor:'#16a34a',tension:.4,fill:false,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
-      annotation:{annotations:{opt:{type:'line',xMin:bpx,xMax:bpx,borderColor:'#ea580c',borderDash:[4,4],label:{content:'Opt',display:true}}}}},
-      scales:{x:{title:{display:true,text:'Prix USD/t',font:{size:10}}},y:{ticks:{callback:v=>fmt(v),font:{size:10}}}}
-    }
-  });
-  document.getElementById('tb-prix').innerHTML = D.prods.map(p=>{
-    const opt=Math.round(p.bmin+(p.bmax-p.bmin)*0.6+p.cout*0.05);
-    const mu=opt-p.cout, mp=Math.round(mu/opt*100);
-    return `<tr><td><strong>${p.n}</strong></td><td>${p.cout} USD/t</td><td>${p.bmin}–${p.bmax}</td>
-      <td class="up"><strong>${opt} USD/t</strong></td><td>${Math.round(mu)} USD/t</td>
-      <td><span class="b ${mp>25?'g':mp>10?'y':'r'}">${mp}%</span></td></tr>`;
-  }).join('');
-}
-  // ═══════════════════════════════════════════════════════
-// M3 — PRODUCTION
-// ═══════════════════════════════════════════════════════
-function cM3() {
-  const plan = D.prods.map(p=>{
-    const cap=D.caps[p.n]||10000, dem=Math.round(p.q/12), prod=Math.min(Math.max(dem,Math.round(dem*1.05)),cap);
-    return {n:p.n,cap,dem,prod,taux:Math.round(prod/cap*100)};
-  });
-  document.getElementById('tb-m3').innerHTML = plan.map(r=>`
-    <tr><td><strong>${r.n}</strong></td><td>${fmt(r.dem)} t</td>
-    <td class="up"><strong>${fmt(r.prod)} t</strong></td>
-    <td style="color:#94a3b8">${fmt(r.cap)} t</td>
-    <td><div style="display:flex;align-items:center;gap:5px">
-      <div style="width:50px;height:5px;background:#f1f5f9;border-radius:3px">
-        <div style="height:100%;width:${Math.min(r.taux,100)}%;background:${r.taux>80?'#ef4444':r.taux>60?'#f59e0b':'#22c55e'};border-radius:3px"></div>
-      </div><span style="font-size:10px">${r.taux}%</span></div></td>
-    <td><span class="b ${r.prod>=r.dem?'g':'r'}">${r.prod>=r.dem?'OK':'Insuf'}</span></td></tr>`).join('');
-  dc('m3'); CH['m3'] = new Chart(document.getElementById('ch-m3'),{type:'bar',
-    data:{labels:plan.map(r=>r.n),datasets:[
-      {label:'Capacite',data:plan.map(r=>r.cap),backgroundColor:'#e2e8f0',borderRadius:3},
-      {label:'Prod LP',data:plan.map(r=>r.prod),backgroundColor:'#ea580c',borderRadius:3},
-      {label:'Demande',data:plan.map(r=>r.dem),backgroundColor:'#1e3a5f',borderRadius:3},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:10}}}}}
-  });
-  document.getElementById('mp-stocks').innerHTML = D.stocks.slice(0,6).map(s=>{
-    const pct=Math.min(100,Math.round(s.s/s.max*100));
-    const col=s.c==='r'?'#ef4444':s.c==='g'?'#16a34a':'#3b82f6';
-    return `<div class="sb"><header><span>${s.n}</span><span style="color:#64748b">${fmt(s.s)} t</span></header>
-      <div class="sb-bg"><div class="sb-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
-  }).join('');
-  document.getElementById('mp-signals').innerHTML = D.stocks.slice(0,6).map(s=>
-    `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f9fafb;font-size:11.5px">
-      <span style="font-weight:500">${s.n}</span><span class="b ${s.c}">${s.sig}</span></div>`).join('');
-}
 
-// ═══════════════════════════════════════════════════════
-// M4 — PROFIT
-// ═══════════════════════════════════════════════════════
-function cM4() {
-  const pn = document.getElementById('m4p').value;
-  const vp = parseInt(document.getElementById('m4px').value)/100;
-  const vv = parseInt(document.getElementById('m4vl').value)/100;
-  const pr = parseInt(document.getElementById('m4pr').value);
-  const rm = parseFloat(document.getElementById('m4rm').value)/100;
-  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
-  const hist = prod.m;
-  const pref = prod.ca/prod.q;
-  const psim = pref*(1+vp)*(1-rm);
-  const vsim = (prod.q/12)*(1+vv)*(pr?1.08:1);
-  const msim = (psim-prod.cout)/Math.max(psim,1)*100;
-  const usd  = (msim/100)*psim*vsim;
-  const delta = (msim-hist).toFixed(1);
-  const el = document.getElementById('m4pred');
-  el.textContent = msim.toFixed(1)+'%';
-  el.className = msim>=hist?'up':'dn';
-  document.getElementById('m4usd').textContent = fmt(usd)+' USD';
-  document.getElementById('m4dlt').textContent = (delta>=0?'+':'')+delta+' pts';
-  document.getElementById('m4dlt').className = delta>=0?'up':'dn';
-  document.getElementById('m4dlb').textContent = 'base: '+hist+'%';
-  document.getElementById('m4jauge').innerHTML = [
-    {l:'Historique',v:hist,c:'#94a3b8'},
-    {l:'Simule',v:msim.toFixed(1),c:msim>=hist?'#16a34a':'#dc2626'}
-  ].map(j=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>${j.l}</span><span style="font-weight:600">${j.v}%</span></div>
-    <div style="height:14px;background:#f1f5f9;border-radius:7px;overflow:hidden">
-      <div style="height:100%;width:${Math.min(100,(j.v/50)*100)}%;background:${j.c};border-radius:7px;transition:width .5s"></div>
-    </div></div>`).join('');
-  let a='';
-  if(vp!==0) a+=`Prix ${vp>0?'+':''}${Math.round(vp*100)}% → ${vp>0?'hausse marge, possible baisse volume':'pression sur marge'}<br>`;
-  if(vv!==0) a+=`Volume ${vv>0?'+':''}${Math.round(vv*100)}% → ${vv>0?'levier positif sur profit':'impact sur CA'}<br>`;
-  if(pr)     a+=`Promotion active → +8% demande estimee<br>`;
-  if(rm>0.02) a+=`Remise ${(rm*100).toFixed(1)}% → reduction prix net et marge<br>`;
-  document.getElementById('m4analyse').innerHTML = a||'Modifier les leviers pour voir l\'analyse.';
-}
+  if(q.includes('eoq')||q.includes('wilson'))
+    return `**Formule EOQ de Wilson:**\n\nQ* = √(2·D·S / H)\n\nRésultats (S=500 MAD, v standard):\n${MAT.map(m=>{const D=m.cj*365,S=500,H=m.p*m.v;return`• **${m.short}** → Q* = ${eoq(D,S,H).toFixed(0)} T`}).join('\n')}\n\nAllez dans **EOQ Wilson** pour simuler.`;
 
-// ═══════════════════════════════════════════════════════
-// SCENARIOS
-// ═══════════════════════════════════════════════════════
-function cSC() {
-  const pn = document.getElementById('scp').value;
-  const prod = D.prods.find(p=>p.n===pn); if(!prod)return;
-  const pref = prod.ca/prod.q, hist = prod.m;
-  const scs = [
-    {n:'Base',px:0,vl:0,pr:0},
-    {n:'Sc 1',px:parseInt(document.getElementById('s1px').value),vl:parseInt(document.getElementById('s1vl').value),pr:parseInt(document.getElementById('s1pr').value)},
-    {n:'Sc 2',px:parseInt(document.getElementById('s2px').value),vl:parseInt(document.getElementById('s2vl').value),pr:parseInt(document.getElementById('s2pr').value)},
-    {n:'Sc 3',px:parseInt(document.getElementById('s3px').value),vl:parseInt(document.getElementById('s3vl').value),pr:parseInt(document.getElementById('s3pr').value)},
-  ];
-  const COLS = ['#94a3b8','#2563eb','#16a34a','#ea580c'];
-  const res = scs.map((sc,i)=>{
-    const ps=pref*(1+sc.px/100), vs=(prod.q/12)*(1+sc.vl/100)*(sc.pr?1.08:1);
-    const m=(ps-prod.cout)/Math.max(ps,1)*100, p=(m/100)*ps*vs;
-    return {n:sc.n, m:m.toFixed(1), p:Math.round(p), col:COLS[i]};
-  });
-  document.getElementById('sc-res').innerHTML = res.map((r,i)=>{
-    const d=(r.m-res[0].m).toFixed(1);
-    return `<div class="card" style="border-top:3px solid ${r.col}">
-      <div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-bottom:3px">${r.n}</div>
-      <div style="font-size:21px;font-weight:700">${r.m}%</div>
-      ${i>0?`<div style="font-size:11px;font-weight:500;color:${d>=0?'#16a34a':'#dc2626'}">${d>=0?'+':''}${d} pts</div>`:''}
-      <div style="font-size:10px;color:#64748b">${fmt(r.p)} USD</div></div>`;
-  }).join('');
-  dc('sc'); CH['sc'] = new Chart(document.getElementById('ch-sc'),{type:'bar',
-    data:{labels:res.map(r=>r.n),datasets:[{data:res.map(r=>parseFloat(r.m)),backgroundColor:COLS,borderRadius:4,barPercentage:.5}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%',font:{size:11}}}}}
-  });
-}
+  if(q.includes('stock') || q.includes('sécurit') || q.includes('ss'))
+    return `**Stock de Sécurité (SS)**\n\nSS = z · σ · √LT\n\nNiveaux de service:\n• 90% → z=1.28\n• **95% → z=1.645** ← OCP recommandé\n• 99% → z=1.96\n\nExemple (σ=15T, LT=7j):\nSS(95%) = 1.645×15×√7 ≈ **65 T**\n\nROP = D·LT + SS`;
 
-// ═══════════════════════════════════════════════════════
-// STOCKS PAGE
-// ═══════════════════════════════════════════════════════
-function buildStocks() {
-  document.getElementById('all-stocks').innerHTML = D.stocks.map(s=>{
-    const pct=Math.min(100,Math.round(s.s/s.max*100));
-    const col=s.c==='r'?'#ef4444':s.c==='g'?'#16a34a':'#3b82f6';
-    return `<div class="sb"><header><span style="font-weight:500">${s.n}</span>
-      <span>${fmt(s.s)} / ${fmt(s.max)} t &nbsp;<span class="b ${s.c}">${s.sig}</span></span></header>
-      <div class="sb-bg"><div class="sb-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
-  }).join('');
-  document.getElementById('tb-achats').innerHTML = D.achats.map(a=>
-    `<tr><td><strong>${a.n}</strong></td><td>${fmt(a.p)} USD/t</td><td>${fmt(a.q)} t</td><td><span class="b b">${a.nb}</span></td></tr>`
-  ).join('');
-}
+  if(q.includes('meilleur')||q.includes('top')||q.includes('recommand')||(q.includes('quel')&&q.includes('fourn')))
+    return `**Classement Fournisseurs Multi-Critères**\n\n${scored.slice(0,3).map((f,i)=>`${['🥇','🥈','🥉'][i]} **${f.n}** (${f.pays}) — Score **${f.s}/100** — Classe ${clsF(f.s)}`).join('\n')}\n\n✅ **${scored[0].n}** est recommandé en Priorité 1.\n\nCritères: Prix 30% · Délai 25% · Fiabilité 30% · ESG 10% · Risque 5%\n\nModifiez les pondérations dans **Fournisseurs**.`;
 
-// ═══════════════════════════════════════════════════════
-// CHATBOT
-// ═══════════════════════════════════════════════════════
-let hist_chat = [];
-
-function saveKey() {
-  const k = document.getElementById('apikey').value;
-  if(k.startsWith('gsk_')){localStorage.setItem('ocp_key',k);document.getElementById('api-n').style.display='none'}
-}
-function loadKey() {
-  const k = localStorage.getItem('ocp_key');
-  if(k){document.getElementById('apikey').value=k;document.getElementById('api-n').style.display='none'}
-}
-
-function ctx() {
-  return `Tu es un expert commercial et financier senior pour OCP S.A. (Office Cherifien des Phosphates, Maroc), Direction Controle de Gestion, usine de Jorf Lasfar. Reponds TOUJOURS en francais. Sois precis et professionnel.
-
-=== DONNEES OCP 2025 ===
-CA: 218.8M USD | Volume: 601 903 t | Marge: 19.6% | Profit: 50.7M USD | Transactions: 537
-
-=== PRODUITS ===
-DAP: 46 967t · 24.2M USD · marge 29.1% · profit 7.9M
-MAP: 41 248t · 20.4M USD · marge 25.9% · profit 6.2M
-NPK: 9 088t  · 4.2M USD  · marge 79.3% · profit 3.6M (MEILLEURE MARGE)
-NPS: 127 200t · 39.5M USD · marge -0.4% · PERTE 367K (PROBLEMATIQUE)
-TSP: 330 000t · 115M USD  · marge 24.1% · profit 33M (PLUS GROS VOLUME)
-ASP: 42 000t  · 12.5M USD · marge -1.8% · PERTE 203K
-DCP: 5 400t   · 2.9M USD  · marge 18.0% · profit 591K
-
-=== MARCHES ===
-Maroc 123M (56%) | Inde 50.5M (23%) | Nigeria 21.7M (10%) | Egypte 19.2M (9%)
-
-Reponds sur la base de ces donnees. Propose des recommandations actionnables.`;
-}
-
-function addMsg(role, txt) {
-  const div = document.createElement('div');
-  div.className = 'msg '+role;
-  div.innerHTML = `<div class="av ${role}">${role==='ai'?'AI':'Moi'}</div><div class="bbl ${role}">${txt}</div>`;
-  document.getElementById('chat-msgs').appendChild(div);
-  document.getElementById('chat-msgs').scrollTop = 9999;
-  return div.querySelector('.bbl');
-}
-
-function addTyp() {
-  const div = document.createElement('div');
-  div.className='msg ai';div.id='typ';
-  div.innerHTML='<div class="av ai">AI</div><div class="bbl ai"><div class="typ"><span></span><span></span><span></span></div></div>';
-  document.getElementById('chat-msgs').appendChild(div);
-  document.getElementById('chat-msgs').scrollTop=9999;
-}
-
-async function sendChat() {
-  const q = document.getElementById('ci').value.trim();
-  if(!q) return;
-  const k = localStorage.getItem('ocp_key');
-  if(!k){document.getElementById('api-n').style.display='block';return}
-  document.getElementById('sugg').style.display='none';
-  document.getElementById('ci').value='';
-  document.getElementById('cs').disabled=true;
-  addMsg('u', q);
-  hist_chat.push({role:'user',content:q});
-  addTyp();
-  try {
-    const messages = [{role:'system',content:ctx()}, ...hist_chat];
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
-      body:JSON.stringify({
-        model:'llama-3.1-8b-instant',
-        messages: messages,
-        max_tokens:1500,
-        temperature:0.7,
-      })
-    });
-    const d = await r.json();
-    document.getElementById('typ')?.remove();
-    if(d.choices?.[0]?.message?.content){
-      const rep=d.choices[0].message.content;
-      hist_chat.push({role:'assistant',content:rep});
-      addMsg('ai',rep.replace(/\n/g,'<br>'));
-    } else if(d.error){
-      addMsg('ai','Erreur Groq : '+(d.error.message||'Verifier la cle API'));
-    }
-  } catch(e) {
-    document.getElementById('typ')?.remove();
-    addMsg('ai','Erreur de connexion. Verifier la cle API Groq (commence par gsk_).');
+  const ff=FOUR.find(f=>q.includes(f.n.toLowerCase()));
+  if(ff){
+    const s=+scoreF(ff).toFixed(1);
+    return `**${ff.n}** [${ff.fl}] — ${ff.pays}\n\n• Score: **${s}/100** — Classe ${clsF(s)}\n• Prix: ${ff.pb} $/T\n• Délai: ${ff.del} jours\n• Fiabilité: ${ff.fib}%\n• ESG: ${ff.esg}/10\n• Risque pays: ${ff.rp}/5\n• Capacité: ${ff.cap.toLocaleString('fr-FR')} T/an\n\n${s>=85?'✅ Priorité 1 — Classe A':s>=70?'✅ Recommandé — Classe B':'⚠️ Usage conditionnel'}`;
   }
-  document.getElementById('cs').disabled=false;
-}
 
-function useS(btn) {document.getElementById('ci').value=btn.textContent;sendChat()}
-  // ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-window.addEventListener('load',()=>{
-  initSelects();buildDash();cM1();cM2();cM3();cM4();cSC();buildStocks();loadKey();
-  // Init previsions selects
-  const s = document.getElementById('prev-produit');
-  D.prods.forEach(p=>{ const o=document.createElement('option');o.value=p.n;o.textContent=p.n;s.appendChild(o) });
-  buildPrevisions();
-});
-
-// ═══════════════════════════════════════════════════════
-// PREVISIONS 2026
-// ═══════════════════════════════════════════════════════
-function buildPrevisions() {
-  const growth = parseInt(document.getElementById('prev-growth').value) / 100;
-  const dprix  = parseInt(document.getElementById('prev-prix').value) / 100;
-  const filtre = document.getElementById('prev-produit').value;
-
-  // Saisonnalite mensuelle basee sur 2025
-  const saison = [0.88, 0.87, 1.05, 1.18, 1.17, 1.05, 0.94, 0.94, 0.94, 1.05, 0.94, 0.87];
-  const labels2025 = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
-
-  // CA mensuel 2025 reel
-  const ca2025 = D.mois.map(m => m.ca);
-  const vol2025 = D.mois.map(m => m.v);
-
-  // Calcul tendance lineaire sur 2025
-  const n = ca2025.length;
-  const mean_ca = ca2025.reduce((a,b)=>a+b,0)/n;
-  let slope = 0;
-  const xi = ca2025.map((_,i) => i - (n-1)/2);
-  slope = xi.reduce((s,x,i) => s + x*(ca2025[i]-mean_ca), 0) / xi.reduce((s,x) => s+x*x, 0);
-
-  // Previsions 2026
-  const ca2026   = saison.map((s,i) => Math.round((mean_ca + slope*(n+i)) * (1+growth) * (1+dprix) * s));
-  const vol2026  = saison.map((s,i) => {
-    const bv = vol2025.reduce((a,b)=>a+b,0)/n;
-    return Math.round(bv * (1+growth) * s);
-  });
-
-  const ca_tot_2025  = ca2025.reduce((a,b)=>a+b,0);
-  const ca_tot_2026  = ca2026.reduce((a,b)=>a+b,0);
-  const vol_tot_2025 = vol2025.reduce((a,b)=>a+b,0);
-  const vol_tot_2026 = vol2026.reduce((a,b)=>a+b,0);
-  const marge_2026   = (19.6 * (1 + dprix * 0.4)).toFixed(1);
-  const profit_2026  = Math.round(ca_tot_2026 * parseFloat(marge_2026) / 100);
-
-  // KPIs
-  document.getElementById('prev-ca').textContent     = (ca_tot_2026/1e6).toFixed(1)+' M';
-  document.getElementById('prev-vol').textContent    = fmt(vol_tot_2026)+' t';
-  document.getElementById('prev-marge').textContent  = marge_2026+'%';
-  document.getElementById('prev-profit').textContent = (profit_2026/1e6).toFixed(1)+' M';
-  const dca = ((ca_tot_2026-ca_tot_2025)/ca_tot_2025*100).toFixed(1);
-  const dvol = ((vol_tot_2026-vol_tot_2025)/vol_tot_2025*100).toFixed(1);
-  document.getElementById('prev-ca-delta').textContent     = (dca>0?'+':'')+dca+'% vs 2025';
-  document.getElementById('prev-vol-delta').textContent    = (dvol>0?'+':'')+dvol+'% vs 2025';
-  document.getElementById('prev-profit-delta').textContent = (dca>0?'+':'')+dca+'% vs 2025';
-
-  // Couleurs KPI
-  ['prev-ca','prev-vol','prev-profit'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    const d  = [dca, dvol, dca][i];
-    el.style.color = parseFloat(d) >= 0 ? '#16a34a' : '#dc2626';
-  });
-
-  // Intervalles de confiance (±8%)
-  const ca2026_hi = ca2026.map(v => Math.round(v*1.08));
-  const ca2026_lo = ca2026.map(v => Math.round(v*0.92));
-
-  // Graphique CA
-  dc('prev-ca'); CH['prev-ca'] = new Chart(document.getElementById('ch-prev-ca'), {
-    type:'line',
-    data:{ labels:labels2025, datasets:[
-      { label:'2025 reel', data:ca2025.map(v=>Math.round(v/1e6*10)/10), borderColor:'#94a3b8', tension:.4, fill:false, pointRadius:3, borderDash:[5,3] },
-      { label:'2026 prevu', data:ca2026.map(v=>Math.round(v/1e6*10)/10), borderColor:'#2563eb', tension:.4, fill:false, pointRadius:4, borderWidth:2 },
-      { label:'Borne haute', data:ca2026_hi.map(v=>Math.round(v/1e6*10)/10), borderColor:'rgba(37,99,235,.2)', tension:.4, fill:'+1', pointRadius:0, borderWidth:1 },
-      { label:'Borne basse', data:ca2026_lo.map(v=>Math.round(v/1e6*10)/10), borderColor:'rgba(37,99,235,.2)', tension:.4, fill:false, pointRadius:0, borderWidth:1 },
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ font:{ size:10 } } } },
-      scales:{ y:{ ticks:{ callback:v=>v+'M', font:{size:10} } }, x:{ ticks:{ font:{size:10} } } }
-    }
-  });
-
-  // Graphique Volume
-  dc('prev-vol'); CH['prev-vol'] = new Chart(document.getElementById('ch-prev-vol'), {
-    type:'line',
-    data:{ labels:labels2025, datasets:[
-      { label:'2025 reel', data:vol2025, borderColor:'#94a3b8', tension:.4, fill:false, pointRadius:3, borderDash:[5,3] },
-      { label:'2026 prevu', data:vol2026, borderColor:'#16a34a', tension:.4, fill:false, pointRadius:4, borderWidth:2 },
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ font:{ size:10 } } } },
-      scales:{ y:{ ticks:{ font:{size:10} } }, x:{ ticks:{ font:{size:10} } } }
-    }
-  });
-
-  // Tableau par produit
-  const prods = filtre === 'ALL' ? D.prods : D.prods.filter(p=>p.n===filtre);
-  document.getElementById('tb-prev-prod').innerHTML = prods.map(p => {
-    const ca26 = Math.round(p.ca * (1+growth) * (1+dprix));
-    const ev   = ((ca26-p.ca)/p.ca*100).toFixed(1);
-    const conf = Math.abs(growth) > 0.08 ? 'Moyenne' : 'Elevee';
-    const cconf= conf==='Elevee'?'g':'y';
-    return `<tr>
-      <td><strong>${p.n}</strong></td>
-      <td>${fmtM(p.ca)} USD</td>
-      <td class="${parseFloat(ev)>=0?'up':'dn'}"><strong>${fmtM(ca26)} USD</strong></td>
-      <td><span class="b ${parseFloat(ev)>=0?'g':'r'}">${ev>=0?'+':''}${ev}%</span></td>
-      <td><span class="b ${cconf}">${conf}</span></td>
-    </tr>`;
-  }).join('');
-
-  // Graphique marge 2026
-  const marges2026 = D.prods.map(p => {
-    const m = p.m + dprix * 15;
-    return parseFloat(m.toFixed(1));
-  });
-  dc('prev-marge'); CH['prev-marge'] = new Chart(document.getElementById('ch-prev-marge'), {
-    type:'bar',
-    data:{ labels:D.prods.map(p=>p.n), datasets:[
-      { label:'Marge 2025', data:D.prods.map(p=>p.m), backgroundColor:'rgba(148,163,184,.6)', borderRadius:3 },
-      { label:'Marge 2026 prevue', data:marges2026, backgroundColor:marges2026.map(m=>m>0?'rgba(22,163,74,.8)':'rgba(220,38,38,.8)'), borderRadius:3 },
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ font:{size:10} } } },
-      scales:{ y:{ ticks:{ callback:v=>v+'%', font:{size:10} } }, x:{ ticks:{ font:{size:9} } } }
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// EXPORT PDF
-// ═══════════════════════════════════════════════════════
-async function exportPDF() {
-  const { jsPDF } = window.jspdf;
-
-  // Notification
-  const notif = document.createElement('div');
-  notif.style.cssText = 'position:fixed;top:20px;right:20px;background:#1e3a5f;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3)';
-  notif.textContent = 'Generation du PDF en cours...';
-  document.body.appendChild(notif);
-
-  try {
-    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const W = 210, M = 15, CW = W - M*2;
-    let y = M;
-
-    // ── Palette couleurs ──
-    const bleu  = [30, 58, 95];
-    const bleu2 = [46, 117, 182];
-    const vert  = [30, 107, 60];
-    const rouge = [192, 0, 0];
-    const gris  = [100, 116, 139];
-
-    // ── Fonctions helpers ──
-    const rect = (x,yy,w,h,r,g,b,fill=true) => {
-      pdf.setFillColor(r,g,b);
-      if(fill) pdf.rect(x,yy,w,h,'F');
-      else { pdf.setDrawColor(r,g,b); pdf.rect(x,yy,w,h,'S'); }
-    };
-    const txt = (t,x,yy,sz,r,g,b,bold=false,align='left') => {
-      pdf.setFontSize(sz);
-      pdf.setFont('helvetica', bold?'bold':'normal');
-      pdf.setTextColor(r,g,b);
-      pdf.text(String(t), x, yy, {align});
-    };
-    const newPage = () => {
-      pdf.addPage();
-      y = M;
-      // Header sur chaque page
-      rect(0,0,W,10,...bleu);
-      txt('OCP Simulateur Commercial — Rapport 2025', W/2, 6.5, 9, 255,255,255, false,'center');
-    };
-    // ══ PAGE 1 — COUVERTURE ══════════════════════════════
-    rect(0, 0, W, 60, ...bleu);
-    txt('OCP SIMULATEUR COMMERCIAL', W/2, 25, 20, 255,255,255, true,'center');
-    txt('Rapport de Performance 2025', W/2, 35, 13, 180,210,240, false,'center');
-    txt('Direction Controle de Gestion — Jorf Lasfar', W/2, 43, 10, 150,190,220, false,'center');
-    const today = new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    txt('Genere le '+today, W/2, 51, 9, 150,190,220, false,'center');
-
-    y = 75;
-
-    // ── Cadre resume ──
-    rect(M, y, CW, 35, 240,248,255);
-    pdf.setDrawColor(...bleu2); pdf.setLineWidth(.4);
-    pdf.rect(M, y, CW, 35, 'S');
-    txt('RESUME EXECUTIF', M+5, y+7, 11, ...bleu, true);
-    txt('Ce rapport presente la performance commerciale OCP 2025 et les previsions 2026.', M+5, y+15, 9, 60,60,60);
-    txt('Donnees reelles issues des systemes CDG · 537 transactions · 7 produits · 5 marches', M+5, y+22, 9, 60,60,60);
-    txt('Modeles ML : M1 Demande (R²=0.84) · M2 Prix · M3 Production · M4 Profit (R²=0.87)', M+5, y+29, 9, 60,60,60);
-    y += 45;
-
-    // ── 4 KPI cards ──
-    const kpis = [
-      {l:'CA Net-Net total',  v:'218.8 M USD',  c:bleu},
-      {l:'Volume total',      v:'601 903 t',    c:vert},
-      {l:'Marge nette moy.',  v:'19.6%',        c:[124,58,237]},
-      {l:'Profit net total',  v:'50.7 M USD',   c:[234,88,12]},
-    ];
-    const kw = (CW-9)/4;
-    kpis.forEach((k,i) => {
-      const kx = M + i*(kw+3);
-      rect(kx, y, kw, 22, 248,250,252);
-      pdf.setDrawColor(200,200,200); pdf.setLineWidth(.3); pdf.rect(kx,y,kw,22,'S');
-      rect(kx, y, kw, 1.5, ...k.c);
-      txt(k.l, kx+kw/2, y+9, 7.5, ...gris, false,'center');
-      txt(k.v, kx+kw/2, y+17, 10, ...k.c, true,'center');
-    });
-    y += 32;
-
-    // ══ SECTION 2 — PERFORMANCE PAR PRODUIT ══
-    rect(M, y, CW, 8, ...bleu);
-    txt('PERFORMANCE PAR PRODUIT', M+4, y+5.5, 10, 255,255,255, true);
-    y += 12;
-
-    // Entetes table
-    const cols = [45,25,25,22,28,25];
-    const heads = ['Produit','Volume (t)','CA (M USD)','Marge','Profit','Statut'];
-    let x = M;
-    rect(x, y, CW, 7, 240,245,255);
-    heads.forEach((h,i) => {
-      txt(h, x+cols[i]/2, y+5, 8, ...bleu, true,'center');
-      x += cols[i];
-    });
-    y += 7;
-
-    D.prods.forEach((p,ri) => {
-      if(y > 250) { newPage(); y = 20; }
-      if(ri%2===0){ rect(M,y,CW,7,250,252,255) }
-      const vals = [p.n, fmt(p.q)+' t', fmtM(p.ca), p.m+'%', (p.p>0?'+':'')+fmtM(p.p), p.m>10?'Bon':(p.m>0?'Moyen':'Perte')];
-      const colors = [null,null,null, p.m>10?vert:(p.m>0?[180,120,0]:rouge), p.p>0?vert:rouge, p.m>10?vert:(p.m>0?[180,120,0]:rouge)];
-      let xx = M;
-      vals.forEach((v,i) => {
-        const c = colors[i] || [30,30,30];
-        txt(v, xx+cols[i]/2, y+5, 8, ...c, i===0,'center');
-        xx += cols[i];
-      });
-      y += 7;
-    });
-    y += 8;
-
-    // ══ SECTION 3 — REPARTITION PAR MARCHE ══
-    if(y > 220) { newPage(); y = 20; }
-    rect(M, y, CW, 8, ...bleu);
-    txt('REPARTITION PAR MARCHE', M+4, y+5.5, 10, 255,255,255, true);
-    y += 12;
-
-    const colsM = [40,35,30,35,30];
-    const headsM = ['Marche','CA (M USD)','Part du CA','Volume (t)','Tendance'];
-    let xm = M;
-    rect(xm, y, CW, 7, 240,245,255);
-    headsM.forEach((h,i) => {
-      txt(h, xm+colsM[i]/2, y+5, 8, ...bleu, true,'center');
-      xm += colsM[i];
-    });
-    y += 7;
-
-    D.pays.forEach((p,ri) => {
-      if(ri%2===0){ rect(M,y,CW,7,250,252,255) }
-      const pct = ((p.ca/D.kpis.ca_total)*100).toFixed(1);
-      const vals = [p.p, fmtM(p.ca)+' USD', pct+'%', fmt(p.v)+' t', ri<2?'Croissance':'Stable'];
-      const c_vals = [null,null,...bleu2,null, ri<2?vert:gris];
-      let xx = M;
-      vals.forEach((v,i) => {
-        txt(v, xx+colsM[i]/2, y+5, 8, ...(c_vals[i]||[30,30,30]), false,'center');
-        xx += colsM[i];
-      });
-      y += 7;
-    });
-    y += 10;
-
-    // ══ PAGE 2 — EVOLUTION MENSUELLE ══
-    newPage(); y = 20;
-    rect(M, y, CW, 8, ...bleu);
-    txt('EVOLUTION MENSUELLE DU CA — 2025', M+4, y+5.5, 10, 255,255,255, true);
-    y += 12;
-
-    // Graphique barre manuel
-    const maxCA = Math.max(...D.mois.map(m=>m.ca));
-    const bh = 50, bw_each = CW/12;
-    D.mois.forEach((m,i) => {
-      const bx    = M + i*bw_each;
-      const bbarH = (m.ca/maxCA)*bh;
-      const by    = y+bh-bbarH;
-      rect(bx+1, by, bw_each-2, bbarH, ...bleu2);
-      txt(m.l, bx+bw_each/2, y+bh+5, 6.5, ...gris, false,'center');
-      txt(fmtM(m.ca), bx+bw_each/2, by-2, 6, ...bleu, false,'center');
-    });
-    y += bh + 12;
-
-    // Tableau mensuel
-    const colsT = [18,22,22,22,22,22,22,22,22,22,22,22];
-    let xh = M;
-    rect(xh, y, CW, 7, 240,245,255);
-    txt('Mois', xh+3, y+5, 7.5, ...bleu, true);
-    xh += 18;
-    D.mois.forEach((m,i) => {
-      txt(m.l, xh+colsT[i+1]/2, y+5, 6.5, ...bleu, true,'center');
-      xh += colsT[i+1]||20;
-    });
-    y += 7;
-
-    const lignesM = [
-      { l:'CA (M USD)', vals:D.mois.map(m=>fmtM(m.ca)), c:[30,30,30] },
-      { l:'Volume (t)',  vals:D.mois.map(m=>(m.v/1000).toFixed(0)+'K'), c:[30,30,30] },
-      { l:'Marge (%)',   vals:D.mois.map(m=>m.m+'%'), c:vert },
-    ];
-    lignesM.forEach((row,ri) => {
-      if(ri%2===0) rect(M,y,CW,7,250,252,255);
-      txt(row.l, M+3, y+5, 7, ...gris);
-      let xx = M+18;
-      row.vals.forEach((v,i) => {
-        txt(v, xx+colsT[i+1]/2, y+5, 6.5, ...row.c, false,'center');
-        xx += colsT[i+1]||20;
-      });
-      y += 7;
-    });
-    y += 10;
-
-    // ══ SECTION PREVISIONS 2026 ══
-    if(y > 200) { newPage(); y = 20; }
-    rect(M, y, CW, 8, 30, 100, 60);
-    txt('PREVISIONS 2026 — PROJECTION TENDANCIELLE', M+4, y+5.5, 10, 255,255,255, true);
-    y += 12;
-
-    const gr = parseInt(document.getElementById('prev-growth').value)/100;
-    const dp = parseInt(document.getElementById('prev-prix').value)/100;
-    const ca26tot = Math.round(D.kpis.ca_total*(1+gr)*(1+dp));
-    const v26tot  = Math.round(D.kpis.vol_total*(1+gr));
-    const m26     = parseFloat((19.6*(1+dp*0.4)).toFixed(1));
-    const p26     = Math.round(ca26tot*m26/100);
-
-    const kpis26 = [
-      {l:'CA prevu 2026',    v:(ca26tot/1e6).toFixed(1)+' M USD', c:[30,100,60]},
-      {l:'Volume prevu',     v:fmt(v26tot)+' t',                  c:[30,100,60]},
-      {l:'Marge prevue',     v:m26+'%',                           c:[124,58,237]},
-      {l:'Profit prevu',     v:(p26/1e6).toFixed(1)+' M USD',     c:[234,88,12]},
-    ];
-    kpis26.forEach((k,i) => {
-      const kx = M + i*(kw+3);
-      rect(kx, y, kw, 20, 240,253,244);
-      pdf.setDrawColor(134,200,134); pdf.setLineWidth(.3); pdf.rect(kx,y,kw,20,'S');
-      txt(k.l, kx+kw/2, y+8, 7.5, ...gris, false,'center');
-      txt(k.v, kx+kw/2, y+16, 10, ...k.c, true,'center');
-    });
-    y += 28;
-
-    // Tableau previsions par produit
-    rect(M, y, CW, 7, 230,244,230);
-    const headsP = ['Produit','CA 2025','CA 2026 prevu','Evolution','Recommandation'];
-    const colsP  = [40,30,35,25,40];
-    let xp = M;
-    headsP.forEach((h,i)=>{ txt(h, xp+colsP[i]/2, y+5, 8, 30,100,60, true,'center'); xp+=colsP[i]; });
-    y += 7;
-
-    D.prods.forEach((p,ri) => {
-      if(y > 265) { newPage(); y = 20; }
-      if(ri%2===0) rect(M,y,CW,7,248,254,248);
-      const ca26 = Math.round(p.ca*(1+gr)*(1+dp));
-      const ev   = ((ca26-p.ca)/p.ca*100).toFixed(1);
-      const reco = p.m > 10 ? 'Maintenir strategie' : p.m > 0 ? 'Optimiser prix' : 'Revoir structure couts';
-      const vals = [p.n, fmtM(p.ca)+' USD', fmtM(ca26)+' USD', (ev>=0?'+':'')+ev+'%', reco];
-      const cs   = [[30,30,30],[80,80,80], parseFloat(ev)>=0?vert:rouge, parseFloat(ev)>=0?vert:rouge, p.m>10?vert:rouge];
-      let xx = M;
-      vals.forEach((v,i) => { txt(v, xx+colsP[i]/2, y+5, 7.5, ...cs[i], false,'center'); xx+=colsP[i]; });
-      y += 7;
-    });
-    y += 10;
-
-    // ══ SECTION RECOMMANDATIONS ══
-    if(y > 220) { newPage(); y = 20; }
-    rect(M, y, CW, 8, ...bleu);
-    txt('RECOMMANDATIONS PRIORITAIRES', M+4, y+5.5, 10, 255,255,255, true);
-    y += 12;
-
-    const recos = [
-      { prio:'URGENT',  col:rouge, titre:'Revoir le pricing NPS 24-24-0', desc:'Marge negative de -0.4% soit une perte de 367 682 USD. Utiliser M2 pour trouver le prix optimal.' },
-      { prio:'URGENT',  col:rouge, titre:'Optimiser le prix ASP 19-19-0', desc:'Marge negative de -1.8% soit une perte de 203 443 USD. Seuil de rentabilite a 278 USD/t.' },
-      { prio:'HAUTE',   col:[180,100,0], titre:'Developper les volumes NPK 15-15-15', desc:'Meilleure marge du portefeuille (79.3%). Doublement du volume genererait +3.6M USD de profit.' },
-      { prio:'MOYENNE', col:vert, titre:'Consolider la position sur le marche Inde', desc:'Deuxieme marche avec 50.5M USD (23% du CA). Fort potentiel de croissance.' },
-    ];
-
-    recos.forEach((r,i) => {
-      if(y > 255) { newPage(); y = 20; }
-      rect(M, y, 2, 16, ...r.col);
-      rect(M+2, y, CW-2, 16, i%2===0?248:252, i%2===0?250:254, i%2===0?252:255);
-      txt('['+r.prio+']', M+5, y+6.5, 8, ...r.col, true);
-      txt(r.titre, M+30, y+6.5, 9, 15,15,15, true);
-      txt(r.desc, M+5, y+13, 8, 80,80,80);
-      y += 20;
-    });
-
-    // ══ PIED DE PAGE FINAL ══
-    const totalPages = pdf.getNumberOfPages();
-    for(let i=1;i<=totalPages;i++){
-      pdf.setPage(i);
-      rect(0, 287, W, 10, ...bleu);
-      txt('OCP S.A. — Direction Controle de Gestion — Jorf Lasfar — CONFIDENTIEL', W/2, 293, 7.5, 200,220,240, false,'center');
-      txt('Page '+i+'/'+totalPages, W-M, 293, 7.5, 200,220,240, false,'right');
-    }
-
-    // Sauvegarder
-    pdf.save('OCP_Simulateur_Rapport_'+new Date().toISOString().slice(0,10)+'.pdf');
-    notif.textContent = '✓ PDF genere avec succes !';
-    notif.style.background = '#16a34a';
-    setTimeout(()=>notif.remove(), 3000);
-
-  } catch(e) {
-    notif.textContent = 'Erreur : '+e.message;
-    notif.style.background = '#dc2626';
-    setTimeout(()=>notif.remove(), 4000);
-    console.error(e);
+  if(q.includes('risque')||q.includes('risk')){
+    const rs=FOUR.map(f=>{const g=f.rp*15+10,o=Math.max(5,100-f.fib),fi=f.rp*8+12,d=(f.del-20)/30*100,p=Math.abs(f.pb-107)/10*20;return{...f,t:+riskF(g,o,fi,d,p).toFixed(1)};}).sort((a,b)=>a.t-b.t);
+    return `**Scores de Risque Fournisseurs**\n\n${rs.map(r=>`• **${r.n}**: ${r.t}/100 — ${clsR(r.t)}`).join('\n')}\n\nRisque = Géo×25% + Ops×30% + Fin×20% + Délai×15% + Prix×10%\n\nAjustez dans **Gestion Risques**.`;
   }
+
+  if(q.includes('scénar')||q.includes('stratég')||q.includes('économ')||q.includes('econom'))
+    return `**6 Stratégies d'Achat Comparées**\n\n🏆 **Contrat 3 ans** — prix –8%\n⚡ **Reverse auction** — prix –12%\n📋 **Contrat annuel** — référence\n🌐 **Multi-sourcing** — risque –40%\n🏠 **Sourcing local** — délai –40%\n📈 **Achat spot** — flexible +8%\n\n💡 OCP recommande: **Contrat 3 ans** ADNOC+Yara.\nÉconomie potentielle jusqu'à **8% sur les prix**.\n\nSimulez dans **Scénarios**.`;
+
+  if(q.includes('monte')||q.includes('carlo')||q.includes('var')||q.includes('cvar'))
+    return `**Simulation Monte Carlo — Box-Muller**\n\nPour D ~ N(μ, σ²):\n• **VaR P95**: quantile 95% des demandes\n• **CVaR**: moyenne au-delà P95\n\nExemple NH3 (1000 sims):\n• μ ≈ 35 489 T/an\n• VaR P95 ≈ 41 200 T (+16%)\n• CVaR ≈ 43 800 T\n\n💡 Utilisez P95 pour Q* robuste.\nLancez dans **Monte Carlo**.`;
+
+  if(q.includes('ml')||q.includes('sarima')||q.includes('xgboost')||q.includes('prévision')||q.includes('mape'))
+    return `**Modèle ML Ensemble OCP**\n\n• SARIMA(1,1,1)(1,1,1)₁₂ — 60%\n• XGBoost Regressor — 40%\n\nPerformances:\n• **MAPE: 4.2%** · **R²: 0.92**\n• 5-fold TimeSeriesCV\n\nVariables clés:\nLag-1 (28%) · Lag-12 (22%) · Trend (13%)\n\nVisualisez dans **Prévisions ML**.`;
+
+  if(q.includes('formule')||q.includes('calcul'))
+    return `**Formules Clés OCP Procurement**\n\n**EOQ Wilson:** Q* = √(2·D·S/H)\n**Stock Sécurité:** SS = z·σ·√LT\n**Réapprovisionnement:** ROP = D·LT+SS\n**Coût Total:** TC = (D/Q)·S + (Q/2)·H\n**Score Fourn.:** S = Px×30%+Dl×25%+Fb×30%+ESG×10%+Rp×5%\n**Score Risque:** R = Géo×25%+Ops×30%+Fin×20%+Dl×15%+Px×10%`;
+
+  if(q.includes('coût total')||q.includes('cout total')||q.includes('budget')){
+    const tot=MAT.reduce((a,m)=>{const D=m.cj*365,S=500,H=m.p*m.v;return a+tc(D,eoq(D,S,H),S,H);},0);
+    return `**Coût Total Annuel (EOQ optimisé)**\n\n**${(tot/1e6).toFixed(2)} M MAD/an**\n\n${MAT.map(m=>{const D=m.cj*365,S=500,H=m.p*m.v,Q=eoq(D,S,H);return`• **${m.short}**: ${(tc(D,Q,S,H)/1e3).toFixed(1)} k MAD/an`;}).join('\n')}\n\n(Coûts gestion: holding + commande)`;
+  }
+
+  if(q.includes('aide')||q.includes('help'))
+    return `**Questions possibles:**\n\n🔢 "EOQ soufre / NH3 / Amine..."\n🏭 "Meilleur fournisseur" / "Score ADNOC"\n⚠️ "Risque fournisseurs"\n💰 "Scénarios achat"\n🎲 "Monte Carlo / VaR"\n🤖 "Prévisions ML / MAPE"\n📐 "Formules EOQ / SS / ROP"\n💵 "Coût total annuel"\n\nTapez votre question en français!`;
+
+  return `Je n'ai pas compris "${input}".\n\nEssayez: "EOQ soufre", "meilleur fournisseur", "risque ADNOC", "scénarios", "formules"\n\nOu tapez **aide** pour voir tout ce que je sais.`;
 }
+
+function renderBub(text){
+  return text.split('\n').map((line,li,arr)=>{
+    const parts=line.split(/(\*\*[^*]+\*\*)/g).map((p,i)=>
+      p.startsWith('**')?<strong key={i}>{p.slice(2,-2)}</strong>:p
+    );
+    return[<span key={li}>{parts}</span>,li<arr.length-1&&<br key={'b'+li}/>];
+  });
+}
+
+/* ════════════════════════════════════
+   WEB SEARCH ENGINES
+════════════════════════════════════ */
+const PROXY='https://api.allorigins.win/raw?url=';
+
+async function searchGoogle(q,key,cx){
+  const url=`https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(q)}&key=${key}&cx=${cx}&num=5&hl=fr`;
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('Google API error '+r.status);
+  const d=await r.json();
+  return(d.items||[]).map(i=>({title:i.title,snippet:i.snippet,link:i.link,source:'google'}));
+}
+
+async function searchDDG(q){
+  const url=PROXY+encodeURIComponent(`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`);
+  const r=await fetch(url);
+  const d=await r.json();
+  const results=[];
+  if(d.AbstractText)results.push({title:d.Heading||q,snippet:d.AbstractText,link:d.AbstractURL||'',source:'ddg'});
+  (d.RelatedTopics||[]).slice(0,4).forEach(t=>{if(t.Text)results.push({title:t.Text.slice(0,60),snippet:t.Text,link:t.FirstURL||'',source:'ddg'});});
+  return results;
+}
+
+async function searchWiki(q){
+  const url=PROXY+encodeURIComponent(`https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`);
+  const r=await fetch(url);
+  const d=await r.json();
+  if(d.type==='disambiguation'||!d.extract)return null;
+  return{title:d.title,snippet:d.extract,link:d.content_urls?.desktop?.page||'',source:'wiki',thumb:d.thumbnail?.source};
+}
+
+async function searchNews(q,key,cx){
+  const url=`https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(q+' actualités 2025')}&key=${key}&cx=${cx}&num=5&dateRestrict=m3&hl=fr`;
+  const r=await fetch(url);
+  const d=await r.json();
+  return(d.items||[]).map(i=>({title:i.title,snippet:i.snippet,link:i.link,source:'news'}));
+}
+
+function isWebQuery(q){
+  const webKW=['prix actuel','cours','marché','news','actualité','actu','recherche','cherche','trouve',
+    'qu\'est','c\'est quoi','définition','explique moi','comment','pourquoi','quand','où est',
+    'météo','dollar','euro','bourse','inflation','guerre','crise','pénurie','disponibilité',
+    'fournisseur mondial','prix mondial','phosphate','sulfate','ammoniaque prix',
+    'latest','recent','today','2024','2025','update'];
+  return webKW.some(kw=>q.includes(kw));
+}
+
+function isOCPQuery(q){
+  const ocpKW=['eoq','wilson','ss ','stock sécur','rop','reappro','coût total','fournisseur',
+    'adnoc','afriquia','aramco','basf','yara','cf ind','score','classe','risque fourn',
+    'matière','ssol','nh3','amine','fuel','k09','phosphorique','granulation','scénari',
+    'monte carlo','sarima','xgboost','mape','prévision','simulateur','simulation'];
+  return ocpKW.some(kw=>q.includes(kw));
+}
+
+function formatSearchResults(results,src){
+  if(!results||results.length===0)return`Aucun résultat trouvé pour cette recherche.`;
+  const ico=src==='google'?'🔍':src==='wiki'?'📖':'🦆';
+  let txt=`${ico} **Résultats ${src==='google'?'Google':src==='wiki'?'Wikipedia':'DuckDuckGo'}:**\n\n`;
+  results.slice(0,4).forEach((r,i)=>{
+    txt+=`**${i+1}. ${r.title}**\n${r.snippet?r.snippet.slice(0,200)+'...':''}\n${r.link?`🔗 ${r.link.slice(0,60)}...`:''}\n\n`;
+  });
+  return txt.trim();
+}
+
+/* ════════════════════════════════════
+   GEMINI AI ENGINE
+════════════════════════════════════ */
+async function callGemini(prompt,key){
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  const r=await fetch(url,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{maxOutputTokens:600,temperature:0.7,topP:0.9}
+    })
+  });
+  if(!r.ok)throw new Error('Gemini '+r.status);
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message);
+  return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+}
+
+function buildGeminiPrompt(q,context,isWeb){
+  const ocpCtx=`Tu es OCP AI, expert senior en procurement et supply chain pour OCP Group (leader mondial des phosphates, Maroc).
+
+DONNÉES OCP INTÉGRÉES:
+• Matières: ${MAT.map(m=>`${m.n}(${m.cj}T/j, ${m.p}$/T)`).join(' | ')}
+• Fournisseurs: ${FOUR.map(f=>`${f.n}[${f.pays}] Prix:${f.pb}$/T Score:${scoreF(f).toFixed(0)}/100`).join(' | ')}
+• Formules: EOQ=√(2DS/H) · SS=z·σ·√LT · ROP=D·LT+SS · TC=(D/Q)S+(Q/2)H
+• Score fournisseur: Prix×30% + Délai×25% + Fiabilité×30% + ESG×10% + Risque×5%`;
+
+  if(isWeb&&context){
+    return `${ocpCtx}
+
+RÉSULTATS DE RECHERCHE WEB:
+${context}
+
+QUESTION DE L'UTILISATEUR: ${q}
+
+Instrutions: Réponds en français, de façon concise et professionnelle (max 6 lignes). Intègre les résultats web avec ton expertise OCP si pertinent. Utilise **gras** pour les points importants.`;
+  }
+  return `${ocpCtx}
+
+QUESTION: ${q}
+
+Réponds en français, de façon professionnelle et concise. Utilise **gras** pour les valeurs clés.`;
+}
+
+/* ════════════════════════════════════
+   AI SUGGESTIONS & INIT
+════════════════════════════════════ */
+const AI_SUGS=['EOQ soufre','Prix phosphate 2025','Meilleur fournisseur','Risque géopolitique','Cours NH3 marché','Scénarios achat'];
+const INIT={role:'ai',text:'Bonjour! Je suis **OCP AI** ✨\n\nJe suis propulsé par **Gemini AI** + **Google Search**, **Wikipedia** et **DuckDuckGo**.\n\nJe peux:\n• Répondre intelligemment avec **Gemini IA** ✨\n• Rechercher des **infos en temps réel** sur le web\n• Analyser vos données **EOQ/fournisseurs/risques**\n\n⚙️ Configurez vos clés API dans **Paramètres** pour activer Gemini + Google.'};
+
+/* ════════════════════════════════════
+   AI AGENT COMPONENT
+════════════════════════════════════ */
+function AIAgent(){
+  const [open,setOpen]=useState(false);
+  const [tab,setTab]=useState('chat'); // 'chat' | 'settings'
+  const [msgs,setMsgs]=useState([INIT]);
+  const [inp,setInp]=useState('');
+  const [typing,setTyping]=useState(false);
+  const [typingLabel,setTypingLabel]=useState('En train de répondre...');
+  const [notif,setNotif]=useState(true);
+  const [gKey,setGKey]=useState(()=>localStorage.getItem('ocp_gkey')||'');
+  const [gCX,setGCX]=useState(()=>localStorage.getItem('ocp_gcx')||'');
+  const [gGemKey,setGGemKey]=useState(()=>localStorage.getItem('ocp_gemkey')||'');
+  const [keySaved,setKeySaved]=useState(false);
+  const [searchMode,setSearchMode]=useState('auto'); // 'auto'|'web'|'local'
+  const endRef=useRef(null);
+  const inpRef=useRef(null);
+
+  useEffect(()=>{if(open&&tab==='chat'){setNotif(false);setTimeout(()=>inpRef.current?.focus(),100);}}, [open,tab]);
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'})},[msgs,typing]);
+
+  function saveKeys(){
+    localStorage.setItem('ocp_gkey',gKey);
+    localStorage.setItem('ocp_gcx',gCX);
+    localStorage.setItem('ocp_gemkey',gGemKey);
+    setKeySaved(true);
+    setTimeout(()=>setKeySaved(false),2500);
+  }
+
+  async function send(txt){
+    const q=(txt||inp).trim();
+    if(!q)return;
+    setInp('');
+    setMsgs(p=>[...p,{role:'user',text:q}]);
+    setTyping(true);
+
+    const ql=q.toLowerCase();
+    const needsWeb=searchMode==='web'||(searchMode==='auto'&&isWebQuery(ql)&&!isOCPQuery(ql));
+    const needsLocal=searchMode==='local'||(searchMode==='auto'&&isOCPQuery(ql));
+    const useGemini=!!gGemKey;
+
+    try{
+      let webCtx='';
+      let webSrc='';
+
+      /* ── COLLECT WEB CONTEXT ── */
+      if(needsWeb||(!needsLocal&&!isOCPQuery(ql))){
+        // 1. Google Search
+        if(gKey&&gCX){
+          setTypingLabel(useGemini?'🔍 Google → ✨ Gemini...':'Recherche Google en cours...');
+          try{
+            const isNewsQ=ql.includes('news')||ql.includes('actua')||ql.includes('récent');
+            const results=isNewsQ?await searchNews(q,gKey,gCX):await searchGoogle(q,gKey,gCX);
+            if(results.length>0){
+              if(useGemini){
+                webCtx=results.map(r=>`- ${r.title}: ${r.snippet||''}`).join('\n');
+                webSrc='google';
+              } else {
+                setMsgs(p=>[...p,{role:'ai',text:formatSearchResults(results,'google'),src:'google'}]);
+                setTyping(false);setTypingLabel('En train de répondre...');return;
+              }
+            }
+          }catch(e){setTypingLabel(useGemini?'Essai DuckDuckGo + Gemini...':'Google indispo. Essai DuckDuckGo...');}
+        }
+
+        // 2. Wikipedia (for definition/explanation queries)
+        if(!webCtx&&(ql.includes('qu\'est')||ql.includes('c\'est quoi')||ql.includes('définition')||ql.includes('explique'))){
+          setTypingLabel(useGemini?'📖 Wikipedia → ✨ Gemini...':'Recherche Wikipedia...');
+          try{
+            const wikiQ=q.replace(/qu'est[- ]ce que|c'est quoi|définition de|explique moi/gi,'').trim();
+            const wiki=await searchWiki(wikiQ||q);
+            if(wiki){
+              if(useGemini){
+                webCtx=`Wikipedia - ${wiki.title}: ${wiki.extract}`;
+                webSrc='wiki';
+              } else {
+                setMsgs(p=>[...p,{role:'ai',text:`📖 **Wikipedia — ${wiki.title}**\n\n${wiki.extract}\n\n🔗 ${wiki.link}`,src:'wiki'}]);
+                setTyping(false);setTypingLabel('En train de répondre...');return;
+              }
+            }
+          }catch(e){}
+        }
+
+        // 3. DuckDuckGo fallback
+        if(!webCtx){
+          setTypingLabel(useGemini?'🦆 DuckDuckGo → ✨ Gemini...':'Recherche DuckDuckGo...');
+          try{
+            const ddgR=await searchDDG(q);
+            if(ddgR.length>0){
+              if(useGemini){
+                webCtx=ddgR.map(r=>`- ${r.title}: ${r.snippet||''}`).join('\n');
+                webSrc='ddg';
+              } else {
+                setMsgs(p=>[...p,{role:'ai',text:formatSearchResults(ddgR,'ddg'),src:'ddg'}]);
+                setTyping(false);setTypingLabel('En train de répondre...');return;
+              }
+            }
+          }catch(e){}
+        }
+
+        // 4. No web results, no Gemini → local fallback
+        if(!useGemini){
+          await new Promise(r=>setTimeout(r,300));
+          setMsgs(p=>[...p,{role:'ai',text:`⚠️ Recherche web indisponible.\n\n`+aiReply(q)}]);
+          setTyping(false);setTypingLabel('En train de répondre...');return;
+        }
+
+      } else {
+        /* ── LOCAL OCP PATH ── */
+        if(!useGemini){
+          await new Promise(r=>setTimeout(r,400+Math.random()*300));
+          setMsgs(p=>[...p,{role:'ai',text:aiReply(q)}]);
+          setTyping(false);setTypingLabel('En train de répondre...');return;
+        }
+        // With Gemini: use local answer as context
+        webCtx=aiReply(q);
+        webSrc='local';
+      }
+
+      /* ── GEMINI SYNTHESIS ── */
+      if(useGemini){
+        setTypingLabel('✨ Gemini génère la réponse...');
+        try{
+          const isWebContext=needsWeb||(!needsLocal&&!isOCPQuery(ql));
+          const prompt=buildGeminiPrompt(q,webCtx,isWebContext&&webCtx&&webSrc!=='local');
+          const reply=await callGemini(prompt,gGemKey);
+          if(reply){
+            const srcTag=webSrc?`${webSrc}_gemini`:'gemini';
+            setMsgs(p=>[...p,{role:'ai',text:reply,src:srcTag}]);
+            setTyping(false);setTypingLabel('En train de répondre...');return;
+          }
+        }catch(e){
+          // Gemini failed → fallback to raw results or local
+          if(webCtx&&webSrc&&webSrc!=='local'){
+            setMsgs(p=>[...p,{role:'ai',text:`⚠️ Gemini indisponible (${e.message}).\n\n`+aiReply(q)}]);
+          } else {
+            setMsgs(p=>[...p,{role:'ai',text:aiReply(q)}]);
+          }
+          setTyping(false);setTypingLabel('En train de répondre...');return;
+        }
+      }
+
+      // Ultimate fallback
+      setMsgs(p=>[...p,{role:'ai',text:aiReply(q)}]);
+    }catch(e){
+      setMsgs(p=>[...p,{role:'ai',text:`❌ Erreur: ${e.message}\n\nRéponse locale:\n`+aiReply(q)}]);
+    }
+    setTyping(false);
+    setTypingLabel('En train de répondre...');
+  }
+
+  const hasGoogle=gKey&&gCX;
+  const hasGemini=!!gGemKey;
+
+  return(
+    <>
+      <button className="ai-fab" onClick={()=>setOpen(o=>!o)} title={hasGemini?'OCP AI — Gemini IA actif':'OCP AI + Web Search'}
+        style={{background:hasGemini?'linear-gradient(135deg,#4285f4,#00A651)':'linear-gradient(135deg,#00A651,#00c46a)'}}>
+        {open?'✕':hasGemini?'✨':'🤖'}
+        {notif&&!open&&<div className="ai-notif">!</div>}
+      </button>
+      {open&&(
+        <div className="ai-panel">
+          {/* HEADER */}
+          <div className="ai-head">
+            <div className="ai-avi">🤖</div>
+            <div className="ai-info">
+              <h4>OCP Procurement AI</h4>
+              <p><span className="ai-dot"/>&nbsp;{hasGemini?'✨ Gemini AI actif'+(hasGoogle?' + 🔍':''):hasGoogle?'🔍 Google connecté':'🦆 DDG + Wiki actifs'}</p>
+            </div>
+            <div style={{marginLeft:'auto',display:'flex',gap:4}}>
+              <button onClick={()=>setTab(t=>t==='settings'?'chat':'settings')}
+                style={{background:tab==='settings'?'var(--P3)':'none',border:'var(--bdr)',color:'var(--txt2)',cursor:'pointer',padding:'3px 7px',borderRadius:'var(--r2)',fontSize:'.7rem'}}
+                title="Paramètres">⚙️</button>
+              <button className="ai-x" onClick={()=>setOpen(false)}>✕</button>
+            </div>
+          </div>
+
+          {/* SETTINGS TAB */}
+          {tab==='settings'&&(
+            <div style={{padding:14,overflowY:'auto',flex:1}}>
+              <div style={{fontSize:'.78rem',fontWeight:700,color:'var(--P)',marginBottom:12}}>⚙️ Configuration Recherche Web</div>
+
+              <div style={{background:'rgba(66,133,244,.08)',border:'1px solid rgba(66,133,244,.3)',borderRadius:'var(--r2)',padding:12,marginBottom:12}}>
+                <div style={{fontSize:'.72rem',color:'#4285f4',fontWeight:700,marginBottom:8}}>✨ Gemini AI — Intelligence Artificielle</div>
+                <div style={{fontSize:'.68rem',color:'var(--txt2)',marginBottom:10,lineHeight:1.5}}>
+                  1. Allez sur <strong style={{color:'#4285f4'}}>aistudio.google.com</strong><br/>
+                  2. Cliquez <strong>Get API Key</strong> → Créez une clé gratuite<br/>
+                  3. Copiez-la ici ↓ · Quota: <strong style={{color:'var(--P)'}}>1 500 req/jour gratuit</strong>
+                </div>
+                <div>
+                  <div style={{fontSize:'.65rem',color:'var(--txt2)',marginBottom:3}}>GEMINI API KEY</div>
+                  <input type="password" value={gGemKey} onChange={e=>setGGemKey(e.target.value)}
+                    placeholder="AIzaSy..." style={{width:'100%',background:'var(--bg2)',border:'1px solid rgba(66,133,244,.4)',color:'var(--txt)',borderRadius:'var(--r2)',padding:'6px 10px',fontSize:'.75rem',outline:'none'}}/>
+                </div>
+                {gGemKey&&<div style={{marginTop:6,fontSize:'.65rem',color:'var(--P)'}}>✅ Gemini activé — réponses intelligentes générées par IA</div>}
+              </div>
+
+              <div style={{background:'var(--bg3)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:12,marginBottom:12}}>
+                <div style={{fontSize:'.72rem',color:'var(--yl)',fontWeight:600,marginBottom:8}}>🔍 Google Custom Search API (optionnel)</div>
+                <div style={{fontSize:'.68rem',color:'var(--txt2)',marginBottom:10,lineHeight:1.5}}>
+                  1. Allez sur <strong style={{color:'var(--bl)'}}>console.cloud.google.com</strong><br/>
+                  2. Activez l'API "Custom Search JSON"<br/>
+                  3. Créez une clé API<br/>
+                  4. Allez sur <strong style={{color:'var(--bl)'}}>programmablesearchengine.google.com</strong><br/>
+                  5. Créez un moteur → copiez l'ID (cx)
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:7}}>
+                  <div>
+                    <div style={{fontSize:'.65rem',color:'var(--txt2)',marginBottom:3}}>API KEY</div>
+                    <input type="password" value={gKey} onChange={e=>setGKey(e.target.value)}
+                      placeholder="AIza..." style={{width:'100%',background:'var(--bg2)',border:'var(--bdr)',color:'var(--txt)',borderRadius:'var(--r2)',padding:'6px 10px',fontSize:'.75rem',outline:'none'}}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:'.65rem',color:'var(--txt2)',marginBottom:3}}>SEARCH ENGINE ID (cx)</div>
+                    <input type="text" value={gCX} onChange={e=>setGCX(e.target.value)}
+                      placeholder="123456789:abcdef..." style={{width:'100%',background:'var(--bg2)',border:'var(--bdr)',color:'var(--txt)',borderRadius:'var(--r2)',padding:'6px 10px',fontSize:'.75rem',outline:'none'}}/>
+                  </div>
+                  <button onClick={saveKeys}
+                    style={{background:keySaved?'#1a3a20':'var(--P)',color:keySaved?'var(--P)':'#000',border:keySaved?'1px solid var(--P)':'none',padding:'6px',borderRadius:'var(--r2)',cursor:'pointer',fontWeight:700,fontSize:'.75rem',transition:'all .3s'}}>
+                    {keySaved?'✅ Sauvegardé!':'💾 Sauvegarder les clés'}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{background:'var(--bg3)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:12,marginBottom:12}}>
+                <div style={{fontSize:'.72rem',color:'var(--bl)',fontWeight:600,marginBottom:8}}>🔀 Mode de Recherche</div>
+                {[{v:'auto',l:'🤖 Auto (détecte la meilleure source)',d:'OCP → local · Général → web'},
+                  {v:'web',l:'🌐 Web uniquement',d:'Toujours chercher sur internet'},
+                  {v:'local',l:'📊 Local uniquement',d:'Données OCP seulement'},
+                ].map(({v,l,d})=>(
+                  <div key={v} onClick={()=>setSearchMode(v)}
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'7px 8px',borderRadius:'var(--r2)',cursor:'pointer',marginBottom:4,
+                      background:searchMode===v?'rgba(0,166,81,.1)':'transparent',border:searchMode===v?'1px solid var(--P)':'1px solid transparent'}}>
+                    <div style={{width:10,height:10,borderRadius:'50%',background:searchMode===v?'var(--P)':'var(--bg4)',border:'2px solid '+(searchMode===v?'var(--P)':'var(--txt2)'),flexShrink:0}}/>
+                    <div><div style={{fontSize:'.72rem',fontWeight:searchMode===v?600:400,color:searchMode===v?'var(--txt)':'var(--txt2)'}}>{l}</div>
+                    <div style={{fontSize:'.65rem',color:'var(--txt2)'}}>{d}</div></div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{background:'var(--bg3)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:10}}>
+                <div style={{fontSize:'.72rem',color:'var(--P)',fontWeight:600,marginBottom:6}}>✅ Sources disponibles</div>
+                {[
+                  {n:'✨ Gemini AI',s:hasGemini,d:'1 500 req/jour · Intelligence artificielle'},
+                  {n:'🔍 Google Search',s:hasGoogle,d:'100 req/jour · Résultats web temps réel'},
+                  {n:'🦆 DuckDuckGo',s:true,d:'Gratuit sans clé'},
+                  {n:'📖 Wikipedia (FR)',s:true,d:'Encyclopédie gratuite'},
+                  {n:'📊 Données OCP locales',s:true,d:'7 matières · 6 fournisseurs'},
+                ].map(({n,s,d})=>(
+                  <div key={n} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'4px 0',borderBottom:'1px solid #21262d'}}>
+                    <div><div style={{fontSize:'.72rem'}}>{n}</div><div style={{fontSize:'.62rem',color:'var(--txt2)'}}>{d}</div></div>
+                    <span style={{fontSize:'.65rem',fontWeight:600,color:s?'var(--P)':'var(--txt2)'}}>{s?'✅ Actif':'⚙️ Config'}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button onClick={()=>setTab('chat')}
+                style={{width:'100%',marginTop:10,background:'var(--P)',color:'#000',border:'none',padding:'7px',borderRadius:'var(--r2)',cursor:'pointer',fontWeight:700,fontSize:'.75rem'}}>
+                ← Retour au chat
+              </button>
+            </div>
+          )}
+
+          {/* CHAT TAB */}
+          {tab==='chat'&&(
+            <>
+              {/* Search mode badge */}
+              <div style={{padding:'4px 12px',background:'var(--bg)',borderBottom:'var(--bdr)',display:'flex',gap:6,alignItems:'center',flexShrink:0}}>
+                <span style={{fontSize:'.62rem',color:'var(--txt2)'}}>Mode:</span>
+                {[{v:'auto',l:'🤖 Auto'},{v:'web',l:'🌐 Web'},{v:'local',l:'📊 Local'}].map(({v,l})=>(
+                  <button key={v} onClick={()=>setSearchMode(v)}
+                    style={{background:searchMode===v?'var(--P3)':'transparent',color:searchMode===v?'var(--P)':'var(--txt2)',border:searchMode===v?'1px solid var(--P)':'1px solid transparent',padding:'2px 7px',borderRadius:10,cursor:'pointer',fontSize:'.62rem',fontWeight:searchMode===v?600:400}}>
+                    {l}
+                  </button>
+                ))}
+                {hasGemini&&<span style={{marginLeft:'auto',fontSize:'.6rem',color:'#4285f4',fontWeight:600}}>✨ Gemini ON</span>}
+                {!hasGemini&&hasGoogle&&<span style={{marginLeft:'auto',fontSize:'.6rem',color:'var(--P)',fontWeight:600}}>🔍 Google ON</span>}
+              </div>
+
+              <div className="ai-msgs">
+                {msgs.map((m,i)=>(
+                  <div key={i} className={`ai-msg ${m.role}`}>
+                    <div className="ai-av" style={m.src&&m.src.includes('gemini')?{background:'rgba(66,133,244,.15)',color:'#4285f4'}:{}}>
+                      {m.role==='ai'?(
+                        m.src==='google'?'🔍':m.src==='wiki'?'📖':m.src==='ddg'?'🦆':
+                        m.src&&m.src.includes('gemini')?'✨':'🤖'
+                      ):'👤'}
+                    </div>
+                    <div className="ai-bub" style={m.src&&m.src.includes('gemini')?{borderLeft:'2px solid rgba(66,133,244,.4)'}:{}}>
+                      {renderBub(m.text)}
+                      {m.src&&<div style={{fontSize:'.6rem',color:'var(--txt2)',marginTop:5,borderTop:'1px solid #30363d',paddingTop:4}}>
+                        {m.src.includes('gemini')?
+                          <span style={{color:'#4285f4'}}>✨ Gemini AI{m.src==='google_gemini'?' + 🔍 Google':m.src==='wiki_gemini'?' + 📖 Wikipedia':m.src==='ddg_gemini'?' + 🦆 DDG':''}</span>:
+                          <span>Source: {m.src==='google'?'🔍 Google':m.src==='wiki'?'📖 Wikipedia FR':m.src==='ddg'?'🦆 DuckDuckGo':'🤖 OCP Local'}</span>
+                        }
+                      </div>}
+                    </div>
+                  </div>
+                ))}
+                {typing&&(
+                  <div className="ai-msg ai">
+                    <div className="ai-av">⏳</div>
+                    <div className="ai-bub">
+                      <div style={{fontSize:'.65rem',color:'var(--txt2)',marginBottom:4}}>{typingLabel}</div>
+                      <div className="ai-typ"><span/><span/><span/></div>
+                    </div>
+                  </div>
+                )}
+                <div ref={endRef}/>
+              </div>
+              <div className="ai-sugs">
+                {AI_SUGS.map(s=><button key={s} className="ai-sug" onClick={()=>send(s)}>{s}</button>)}
+              </div>
+              <div className="ai-inp-row">
+                <input ref={inpRef} value={inp} onChange={e=>setInp(e.target.value)}
+                  placeholder={hasGemini?"Posez n'importe quelle question à Gemini AI...":searchMode==='web'?"Rechercher sur le web...":searchMode==='local'?"Question OCP...":"Question ou recherche web..."}
+                  onKeyDown={e=>e.key==='Enter'&&send()}/>
+                <button onClick={()=>send()} disabled={!inp.trim()||typing}
+                  style={{background:hasGemini?'linear-gradient(135deg,#4285f4,#00A651)':searchMode==='web'?'var(--bl)':searchMode==='local'?'var(--P)':'linear-gradient(135deg,var(--P),var(--bl))'}}>
+                  {hasGemini?'✨':searchMode==='web'?'🔍':'➤'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+/* SIDEBAR */
+function Sidebar({page,setPage}){
+  const now=new Date();
+  const phColors=['#00c853','#2979ff','#ffa502','#00bcd4','#9c27b0','#00c853','#ff4757','#7a8fa8'];
+  return(
+    <div className="sb">
+      {/* LOGO */}
+      <div className="sb-logo">
+        <div className="sb-logo-head">
+          <div className="sb-logo-icon">⬡</div>
+          <div>
+            <h1>OCP <span>INTEL</span></h1>
+          </div>
+        </div>
+        <div style={{fontSize:'.58rem',color:'var(--txt3)',letterSpacing:'.5px',textTransform:'uppercase',paddingLeft:46,marginTop:-2}}>Procurement Intelligence Platform</div>
+        <div className="sb-status" style={{marginTop:8}}>
+          <div className="sb-dot"/>
+          <span className="sb-status-txt">SYSTÈME ACTIF · {now.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}</span>
+        </div>
+      </div>
+
+      {/* NAVIGATION */}
+      <nav className="sb-nav">
+        {PHASES.map(ph=>(
+          <div key={ph.id} className={'ni'+(page===ph.id?' act':'')} onClick={()=>setPage(ph.id)}
+            style={page===ph.id?{borderLeftColor:phColors[ph.id],color:phColors[ph.id],background:`${phColors[ph.id]}12`}:{}}>
+            <span className="ni-ico">{ph.ico}</span>
+            <span>{ph.lbl}</span>
+            {page===ph.id&&<span style={{marginLeft:'auto',width:6,height:6,borderRadius:'50%',background:phColors[ph.id],flexShrink:0,boxShadow:`0 0 8px ${phColors[ph.id]}`}}/>}
+          </div>
+        ))}
+      </nav>
+
+      {/* SECTION INFO */}
+      <div style={{padding:'10px 14px',borderTop:'var(--bdr)',background:'var(--bg)',flexShrink:0}}>
+        <div style={{fontSize:'.58rem',color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:6,fontWeight:700}}>Section active</div>
+        <div style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',background:'var(--bg3)',border:`1px solid ${phColors[page]}33`,borderRadius:'var(--r2)'}}>
+          <span style={{fontSize:'1rem'}}>{PHASES[page].ico}</span>
+          <div>
+            <div style={{fontSize:'.72rem',fontWeight:700,color:phColors[page]}}>{PHASES[page].lbl}</div>
+            <div style={{fontSize:'.58rem',color:'var(--txt3)'}}>Phase {page} / 7</div>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="sb-foot">
+        <span className="sb-foot-txt">OCP Group · React 18</span>
+        <span className="sb-foot-badge">v2.0 PRO</span>
+      </div>
+    </div>
+  );
+}
+
+/* TOPBAR */
+function TopBar({page}){
+  const ph=PHASES[page];
+  const now=new Date();
+  const phColors=['#00c853','#2979ff','#ffa502','#00bcd4','#9c27b0','#00c853','#ff4757','#7a8fa8'];
+  return(
+    <div className="topbar">
+      <div className="topbar-left">
+        <div className="topbar-ico" style={{borderColor:phColors[page]+'44',background:phColors[page]+'12'}}>
+          <span style={{fontSize:'.95rem'}}>{ph.ico}</span>
+        </div>
+        <div>
+          <div className="topbar-title">{ph.lbl}</div>
+          <div className="topbar-sub">Phase {page} / 7 · OCP Procurement Intelligence</div>
+        </div>
+      </div>
+      <div className="topbar-right">
+        <span className="badge badge-grn">⬡ OCP Group</span>
+        <span className="badge badge-bl">Procurement Pro</span>
+        <span className="badge badge-yl">ML MAPE 4.2%</span>
+        <div className="topbar-div"/>
+        <span className="topbar-time">
+          {now.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ════════ DASHBOARD ════════ */
+function Dash(){
+  const barRef=useRef(null),dRef=useRef(null),hRef=useRef(null);
+  const totCost=useMemo(()=>MAT.reduce((a,m)=>{const D=m.cj*365,S=500,H=m.p*m.v;return a+tc(D,eoq(D,S,H),S,H);},0),[]);
+  const scores=useMemo(()=>FOUR.map(f=>({...f,score:+scoreF(f).toFixed(1)})).sort((a,b)=>b.score-a.score),[]);
+
+  const GX={color:'#4a5f7a',font:{size:9}};
+  const GRID={color:'#0f1a2a'};
+
+  useChart(barRef,()=>({type:'bar',
+    data:{labels:MAT.map(m=>m.short),datasets:[{label:'EOQ (T)',
+      data:MAT.map(m=>{const D=m.cj*365,S=500,H=m.p*m.v;return+eoq(D,S,H).toFixed(0)}),
+      backgroundColor:MAT.map(m=>m.col+'99'),borderColor:MAT.map(m=>m.col),borderWidth:1,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:GX,grid:{color:'transparent'}},y:{ticks:GX,grid:GRID}}}
+  }),[]);
+
+  useChart(dRef,()=>({type:'doughnut',
+    data:{labels:MAT.map(m=>m.short),datasets:[{data:MAT.map(m=>m.cj),backgroundColor:MAT.map(m=>m.col+'cc'),borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'right',labels:{color:'#4a5f7a',font:{size:9},boxWidth:8,padding:6}}}}
+  }),[]);
+
+  useChart(hRef,()=>({type:'bar',
+    data:{labels:scores.map(f=>f.n),datasets:[{label:'Score',data:scores.map(f=>f.score),
+      backgroundColor:scores.map(f=>f.score>=85?'#00c85399':f.score>=70?'#2979ff88':'#ffa50266'),
+      borderRadius:4,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+      scales:{x:{min:0,max:100,ticks:GX,grid:GRID},y:{ticks:GX,grid:{color:'transparent'}}}}
+  }),[]);
+
+  return(
+    <>
+      {/* KPI STRIP */}
+      <div className="kpi-strip">
+        {[
+          {ico:'📦',l:'Matières actives',v:MAT.length,col:'var(--bl)',s:'7 catégories · OCP Portfolio',c:'var(--bl)',tr:null},
+          {ico:'🏭',l:'Fournisseurs',v:FOUR.length,col:'var(--cy)',s:'4 pays · 3 continents',c:'var(--cy)',tr:null},
+          {ico:'💰',l:'Coût EOQ Annuel',v:(totCost/1e6).toFixed(2),u:'M MAD',col:'var(--yl)',s:'Optimisé Wilson 2025',c:'var(--yl)',tr:{dir:'dn',txt:'–7%'}},
+          {ico:'🏆',l:'Score Top Fournisseur',v:scores[0].score,u:'/100',col:'var(--P)',s:scores[0].n+' — Classe A',c:'var(--P)',tr:{dir:'up',txt:'+2pt'}},
+        ].map((k,i)=>(
+          <div key={i} className="kpi" style={{'--kpi-c':k.c}}>
+            <div className="kpi-ico">{k.ico}</div>
+            <div className="kpi-lbl">{k.l}</div>
+            <div className="kpi-val" style={{color:k.col}}>{k.v}{k.u&&<span style={{fontSize:'.9rem',color:'var(--txt3)',fontWeight:500}}> {k.u}</span>}</div>
+            <div className="kpi-sub">{k.s}{k.tr&&<span className={`kpi-trend ${k.tr.dir}`}>{k.tr.dir==='up'?'▲':'▼'} {k.tr.txt}</span>}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 3-column charts */}
+      <div className="g3">
+        <div className="card"><div className="ct">EOQ Optimal par matière</div><div className="chart-box md"><canvas ref={barRef}/></div></div>
+        <div className="card"><div className="ct">Consommation journalière (T/j)</div><div className="chart-box md"><canvas ref={dRef}/></div></div>
+        <div className="card"><div className="ct">Score fournisseurs</div><div className="chart-box md"><canvas ref={hRef}/></div></div>
+      </div>
+
+      {/* Tables */}
+      <div className="g2">
+        <div className="card">
+          <div className="ct">🏭 Classement Multi-Critères</div>
+          <table>
+            <thead><tr><th>#</th><th>Fournisseur</th><th>Score</th><th>Cl.</th><th>$/T</th></tr></thead>
+            <tbody>{scores.map((f,i)=>{const cls=clsF(f.score);return(
+              <tr key={f.id}>
+                <td style={{color:'var(--yl)',fontWeight:700}}>{i+1}</td>
+                <td style={{fontWeight:600}}>[{f.fl}] {f.n}</td>
+                <td><div style={{display:'flex',alignItems:'center',gap:5}}>
+                  <div className="pbar" style={{flex:1,marginTop:0}}><div className="pb-fill" style={{width:f.score+'%',background:'var(--P)'}}/></div>
+                  <span style={{fontWeight:700,fontSize:'.72rem'}}>{f.score}</span></div></td>
+                <td><span className={'pill pill-'+cls}>{cls}</span></td>
+                <td style={{color:'var(--txt2)'}}>{f.pb}</td>
+              </tr>
+            );})}</tbody>
+          </table>
+        </div>
+        <div className="card">
+          <div className="ct">🗂️ Matières — Synthèse</div>
+          <table>
+            <thead><tr><th>Matière</th><th>Conso/j</th><th>Prix</th><th>Q*</th><th>Cat.</th></tr></thead>
+            <tbody>{[...MAT].sort((a,b)=>b.cj-a.cj).map(m=>{
+              const D=m.cj*365,S=500,H=m.p*m.v;
+              return(<tr key={m.id}>
+                <td><span style={{color:m.col,fontWeight:700}}>●</span> {m.short}</td>
+                <td style={{fontWeight:600}}>{m.cj.toLocaleString('fr-FR')}</td>
+                <td>{m.p}</td>
+                <td style={{color:'var(--P)',fontWeight:600}}>{eoq(D,S,H).toFixed(0)}</td>
+                <td style={{color:'var(--txt2)',fontSize:'.68rem'}}>{m.cat}</td>
+              </tr>);
+            })}</tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ EOQ PAGE ════════ */
+function EOQPage(){
+  const [mid,setMid]=useState('M1');
+  const [S,setS]=useState(500);
+  const [z,setZ]=useState(95);
+  const [lt,setLt]=useState(7);
+  const [sig,setSig]=useState(15);
+  const cRef=useRef(null),sRef=useRef(null);
+  const m=MAT.find(x=>x.id===mid);
+  const D=m.cj*365,H=m.p*m.v,zv=Z_MAP[z]||1.645;
+  const Q=eoq(D,S,H),SS=ss(zv,sig,lt),ROP=rop(m.cj,lt,SS),TC=tc(D,Q,S,H);
+
+  useChart(cRef,()=>{
+    const qs=Array.from({length:60},(_,i)=>(Q*.1+i*(Q*3.5/60)).toFixed(0));
+    const ho=qs.map(q=>(+q/2)*H),or=qs.map(q=>(D/+q)*S),tot=qs.map((_,i)=>ho[i]+or[i]);
+    return{type:'line',data:{labels:qs,datasets:[
+      {label:'Total',data:tot,borderColor:'#00A651',backgroundColor:'rgba(0,166,81,.08)',fill:true,tension:.3,borderWidth:2,pointRadius:0},
+      {label:'Holding',data:ho,borderColor:'#58a6ff',borderWidth:1.5,tension:.3,pointRadius:0},
+      {label:'Ordering',data:or,borderColor:'#d29922',borderWidth:1.5,tension:.3,pointRadius:0},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9}}}},
+      scales:{x:{ticks:{color:'#4a5f7a',maxTicksLimit:7,font:{size:9}}},y:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'}}}}};
+  },[mid,S,z,lt,sig]);
+
+  useChart(sRef,()=>{
+    const ds=[0.7,0.8,0.9,1.0,1.1,1.2,1.3];
+    return{type:'bar',data:{labels:ds.map(d=>'D×'+d),datasets:[{label:'Q* (T)',
+      data:ds.map(d=>+eoq(D*d,S,H).toFixed(0)),
+      backgroundColor:ds.map((_,i)=>i===3?'#00A651cc':'#58a6ff44'),
+      borderColor:ds.map((_,i)=>i===3?'#00A651':'#58a6ff'),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5f7a',font:{size:9}}},y:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'}}}}};
+  },[mid,S]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div className="ctrl-row">
+          <div className="ctrl-grp"><div className="ctrl-lbl">Matière</div>
+            <select value={mid} onChange={e=>setMid(e.target.value)}>{MAT.map(m=><option key={m.id} value={m.id}>{m.n}</option>)}</select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">S = {S} MAD/cmd</div>
+            <input type="range" min="100" max="2000" step="50" value={S} onChange={e=>setS(+e.target.value)}/></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">LT = {lt} jours</div>
+            <input type="range" min="1" max="60" value={lt} onChange={e=>setLt(+e.target.value)}/></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">Niveau service</div>
+            <select value={z} onChange={e=>setZ(+e.target.value)}>
+              <option value={90}>90%</option><option value={95}>95%</option>
+              <option value={99}>99%</option><option value={99.9}>99.9%</option></select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">σ = {sig} T</div>
+            <input type="range" min="1" max="100" value={sig} onChange={e=>setSig(+e.target.value)}/></div>
+        </div>
+      </div>
+      <div className="kpi-strip">
+        {[
+          {l:'Q* Optimal',v:Q.toFixed(0),u:'T',col:'var(--P)',f:'Q* = √(2·D·S/H)'},
+          {l:'Stock Sécurité SS',v:SS.toFixed(0),u:'T',col:'var(--bl)',f:'SS = z·σ·√LT'},
+          {l:'Point Réappro. ROP',v:ROP.toFixed(0),u:'T',col:'var(--pu)',f:'ROP = D·LT + SS'},
+          {l:'Coût Total Annuel',v:(TC/1e3).toFixed(1),u:'k MAD',col:'var(--yl)',f:(D/Q).toFixed(1)+' cmd/an'},
+        ].map((k,i)=>(
+          <div key={i} className="kpi">
+            <div className="kpi-lbl">{k.l}</div>
+            <div className="kpi-val" style={{color:k.col}}>{k.v}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> {k.u}</span></div>
+            <div className="kpi-sub" style={{fontFamily:'monospace',color:k.col+'99',fontSize:'.62rem'}}>{k.f}</div>
+          </div>
+        ))}
+      </div>
+      <div className="g2">
+        <div className="card"><div className="ct">📈 Courbe Coûts — {m.short}</div><div className="chart-box lg"><canvas ref={cRef}/></div></div>
+        <div className="card">
+          <div className="ct">🔬 Sensibilité Q* à la Demande</div>
+          <div className="chart-box lg"><canvas ref={sRef}/></div>
+          <div style={{marginTop:8}}>
+            <div className="mrow"><span className="mk">Demande D</span><span className="mv">{D.toFixed(0)} T/an</span></div>
+            <div className="mrow"><span className="mk">Holding H</span><span className="mv">{H.toFixed(2)} MAD/T/an</span></div>
+            <div className="mrow"><span className="mk">Prix</span><span className="mv">{m.p} $/T</span></div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ FOURNISSEURS ════════ */
+function FousPage(){
+  const [wx,setWx]=useState({px:30,dl:25,fb:30,es:10,rp:5});
+  const rRef=useRef(null),bRef=useRef(null);
+  const w={px:wx.px/100,dl:wx.dl/100,fb:wx.fb/100,es:wx.es/100,rp:wx.rp/100};
+  const scored=useMemo(()=>FOUR.map(f=>({...f,score:+scoreF(f,w).toFixed(1)})).sort((a,b)=>b.score-a.score),[JSON.stringify(wx)]);
+  const wTotal=Object.values(wx).reduce((a,b)=>a+b,0);
+
+  useChart(rRef,()=>({type:'radar',
+    data:{labels:['Prix','Délai','Fiabilité','ESG','Risque(inv)'],
+      datasets:FOUR.map((f,i)=>({label:f.n,
+        data:[Math.max(0,100-((f.pb-100)/20*100)),Math.max(0,100-((f.del-20)/30*100)),f.fib,f.esg*10,Math.max(0,100-(f.rp-1)*20)],
+        borderColor:['#58a6ff','#3fb950','#d29922','#f85149','#bc8cff','#ffa657'][i],
+        backgroundColor:'transparent',borderWidth:1.5,pointRadius:3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{ticks:{color:'#4a5f7a',backdropColor:'transparent',font:{size:8}},grid:{color:'#30363d'},pointLabels:{color:'#4a5f7a',font:{size:9}}}},
+      plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9}}}}}
+  }),[JSON.stringify(wx)]);
+
+  useChart(bRef,()=>({type:'bar',
+    data:{labels:scored.map(f=>f.n),datasets:[{label:'Score',data:scored.map(f=>f.score),
+      backgroundColor:scored.map(f=>f.score>=85?'#00A651cc':f.score>=70?'#58a6ffcc':'#d2992244'),
+      borderWidth:0,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5f7a',font:{size:9}}},y:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'},min:0,max:100}}}
+  }),[JSON.stringify(wx)]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div style={{marginBottom:7,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+          <span style={{fontSize:'.72rem',color:'var(--txt2)'}}>Pondération critères:</span>
+          <span className={'badge '+(wTotal!==100?'badge-yl':'badge-grn')}>Total: {wTotal}%</span>
+          {wTotal!==100&&<span style={{color:'var(--yl)',fontSize:'.68rem'}}>La somme doit être 100%</span>}
+        </div>
+        <div className="ctrl-row">
+          {[{k:'px',l:'Prix 💲'},{k:'dl',l:'Délai ⏱'},{k:'fb',l:'Fiabilité ✅'},{k:'es',l:'ESG 🌱'},{k:'rp',l:'Risque 🌍'}].map(({k,l})=>(
+            <div key={k} className="ctrl-grp">
+              <div className="ctrl-lbl">{l} ({wx[k]}%)</div>
+              <input type="range" min="0" max="60" step="5" value={wx[k]} onChange={e=>setWx(p=>({...p,[k]:+e.target.value}))}/>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="g2">
+        <div className="card"><div className="ct">📊 Scores</div><div className="chart-box md"><canvas ref={bRef}/></div></div>
+        <div className="card"><div className="ct">🕸️ Radar Multi-Critères</div><div className="chart-box md"><canvas ref={rRef}/></div></div>
+      </div>
+      <div className="card">
+        <div className="ct">🏆 Classement Complet</div>
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Fournisseur</th><th>Pays</th><th>Score</th><th>Cl.</th><th>Cap. T/an</th><th>$/T</th><th>Délai j</th><th>Fiab.%</th><th>ESG</th><th>Risque</th></tr></thead>
+            <tbody>{scored.map((f,i)=>{const cls=clsF(f.score);return(
+              <tr key={f.id} style={i===0?{background:'rgba(0,166,81,.04)'}:{}}>
+                <td style={{fontWeight:700,color:'var(--yl)'}}>{i+1}</td>
+                <td style={{fontWeight:600}}>[{f.fl}] {f.n}</td>
+                <td style={{color:'var(--txt2)',fontSize:'.7rem'}}>{f.pays}</td>
+                <td><div style={{display:'flex',alignItems:'center',gap:4}}>
+                  <div className="pbar" style={{width:50,marginTop:0}}><div className="pb-fill" style={{width:f.score+'%',background:'var(--P)'}}/></div>
+                  <strong style={{fontSize:'.72rem'}}>{f.score}</strong></div></td>
+                <td><span className={'pill pill-'+cls}>{cls}</span></td>
+                <td style={{fontSize:'.72rem'}}>{f.cap.toLocaleString('fr-FR')}</td>
+                <td>{f.pb}</td><td>{f.del}</td><td>{f.fib}</td>
+                <td>{f.esg}/10</td>
+                <td style={{color:f.rp<=2?'var(--P)':f.rp<=3?'var(--yl)':'var(--rd)'}}>{f.rp}/5</td>
+              </tr>
+            );})}</tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ SCENARIOS ════════ */
+const SCEN=[
+  {n:'Achat spot',desc:'+8% marché',px:1.08,del:1.0,rb:0.90,esg:0.9,co:1.0},
+  {n:'Contrat annuel',desc:'Prix –3%',px:0.97,del:1.0,rb:0.97,esg:1.0,co:1.2},
+  {n:'Contrat 3 ans',desc:'Prix –8%',px:0.92,del:0.95,rb:0.98,esg:1.05,co:1.5},
+  {n:'Multi-sourcing',desc:'Risque –40%',px:1.02,del:1.05,rb:0.99,esg:1.0,co:1.3},
+  {n:'Sourcing local',desc:'Délai –40%',px:1.10,del:0.60,rb:0.95,esg:1.15,co:1.1},
+  {n:'Reverse auction',desc:'Prix –12%',px:0.88,del:1.10,rb:0.88,esg:0.85,co:0.9},
+];
+
+function ScenPage(){
+  const [mid,setMid]=useState('M1');
+  const [baseS,setBaseS]=useState(500);
+  const bRef=useRef(null),cRef=useRef(null);
+  const m=MAT.find(x=>x.id===mid);
+  const D=m.cj*365;
+  const results=useMemo(()=>SCEN.map(sc=>{
+    const pAdj=m.p*sc.px,H=pAdj*m.v,Q=eoq(D,baseS*sc.co,H);
+    const cost=tc(D,Q,baseS*sc.co,H)*sc.rb,total=cost+D*pAdj;
+    return{...sc,Q:+Q.toFixed(0),total:+(total/1e6).toFixed(2),risk:+(1/sc.rb*50*(2-sc.esg)).toFixed(1)};
+  }),[mid,baseS]);
+  const base=results[1].total,best=results.reduce((a,b)=>b.total<a.total?b:a);
+
+  useChart(bRef,()=>({type:'bar',
+    data:{labels:SCEN.map(s=>s.n),datasets:[{label:'M MAD',data:results.map(r=>r.total),
+      backgroundColor:results.map(r=>r.n===best.n?'#00A651cc':'#58a6ff33'),
+      borderColor:results.map(r=>r.n===best.n?'#00A651':'#58a6ff'),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5f7a',maxRotation:20,font:{size:9}}},y:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'}}}}
+  }),[mid,baseS]);
+
+  useChart(cRef,()=>({type:'radar',
+    data:{labels:['Coût(inv)','Délai(inv)','Fiab.','ESG','Risque(inv)'],
+      datasets:results.slice(0,4).map((r,i)=>({label:r.n,
+        data:[100-(r.px-.85)*500,100-(r.del-.6)*150,r.rb*100,r.esg*90,100-r.risk],
+        borderColor:['#00A651','#58a6ff','#d29922','#f85149'][i],
+        backgroundColor:'transparent',borderWidth:1.5,pointRadius:3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{ticks:{color:'#4a5f7a',backdropColor:'transparent',font:{size:8}},grid:{color:'#30363d'},pointLabels:{color:'#4a5f7a',font:{size:9}}}},
+      plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9}}}}}
+  }),[mid,baseS]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div className="ctrl-row">
+          <div className="ctrl-grp"><div className="ctrl-lbl">Matière</div>
+            <select value={mid} onChange={e=>setMid(e.target.value)}>{MAT.map(m=><option key={m.id} value={m.id}>{m.n}</option>)}</select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">S base = {baseS} MAD</div>
+            <input type="range" min="100" max="2000" step="50" value={baseS} onChange={e=>setBaseS(+e.target.value)}/></div>
+        </div>
+      </div>
+      <div className="kpi-strip">
+        <div className="kpi"><div className="kpi-lbl">🏆 Meilleur Scénario</div><div className="kpi-val" style={{fontSize:'1rem',color:'var(--P)'}}>{best.n}</div><div className="kpi-sub">{best.desc}</div></div>
+        <div className="kpi"><div className="kpi-lbl">💰 Économie vs Contrat</div><div className="kpi-val" style={{color:'var(--yl)'}}>{(base-best.total).toFixed(2)} <span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}>M MAD</span></div><div className="kpi-sub">{((base-best.total)/base*100).toFixed(1)}% d'économie</div></div>
+        <div className="kpi"><div className="kpi-lbl">⚠️ Risque Minimum</div>{(()=>{const r=results.reduce((a,b)=>b.risk<a.risk?b:a);return<><div className="kpi-val" style={{fontSize:'1rem',color:'var(--P)'}}>{r.n}</div><div className="kpi-sub">Score: {r.risk}</div></>;})()}</div>
+        <div className="kpi"><div className="kpi-lbl">📦 Q* Best Scénario</div><div className="kpi-val" style={{color:'var(--bl)'}}>{best.Q.toLocaleString('fr-FR')} <span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}>T</span></div></div>
+      </div>
+      <div className="g2">
+        <div className="card"><div className="ct">📊 Coûts par Scénario</div><div className="chart-box md"><canvas ref={bRef}/></div></div>
+        <div className="card"><div className="ct">🕸️ Multi-Critères (Top 4)</div><div className="chart-box md"><canvas ref={cRef}/></div></div>
+      </div>
+      <div className="card">
+        <div className="ct">📋 Détail 6 Scénarios</div>
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th>Scénario</th><th>Desc.</th><th>Q* (T)</th><th>Coût (M MAD)</th><th>vs Contrat</th><th>Risque</th></tr></thead>
+            <tbody>{results.map((r,i)=>{const diff=((r.total-base)/base*100);return(
+              <tr key={i} style={r.n===best.n?{background:'rgba(0,166,81,.05)'}:{}}>
+                <td style={{fontWeight:600}}>{r.n===best.n?'★ ':''}{r.n}</td>
+                <td style={{color:'var(--txt2)',fontSize:'.72rem'}}>{r.desc}</td>
+                <td>{r.Q.toLocaleString('fr-FR')}</td>
+                <td style={{fontWeight:700}}>{r.total}</td>
+                <td style={{color:diff<0?'var(--P)':'var(--rd)',fontWeight:600}}>{diff>0?'+':''}{diff.toFixed(1)}%</td>
+                <td style={{color:r.risk<30?'var(--P)':r.risk<60?'var(--yl)':'var(--rd)'}}>{r.risk}</td>
+              </tr>
+            );})}</tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ MONTE CARLO ════════ */
+function MCPage(){
+  const [mid,setMid]=useState('M2');
+  const [n,setN]=useState(1000);
+  const [cv,setCv]=useState(0.15);
+  const [running,setRunning]=useState(false);
+  const [res,setRes]=useState(null);
+  const hRef=useRef(null),cRef=useRef(null);
+  const hInst=useRef(null),cInst=useRef(null);
+  const m=MAT.find(x=>x.id===mid);
+
+  function runSim(){
+    setRunning(true);
+    setTimeout(()=>{
+      const D=m.cj*365,sig=D*cv;
+      const sims=Array.from({length:n},()=>D+bm()*sig).sort((a,b)=>a-b);
+      const mean=sims.reduce((a,b)=>a+b,0)/n;
+      const std=Math.sqrt(sims.reduce((a,b)=>a+(b-mean)**2,0)/n);
+      const p95=sims[Math.floor(n*.95)],tail=sims.slice(Math.floor(n*.95));
+      const cvar=tail.reduce((a,b)=>a+b,0)/tail.length;
+      const H=m.p*m.v,Qb=eoq(D,500,H),Qp=eoq(p95,500,H);
+      setRes({sims,mean,std,p95,cvar,Qb,Qp,TCb:tc(D,Qb,500,H),TCp:tc(p95,Qp,500,H)});
+      setRunning(false);
+    },60);
+  }
+
+  useEffect(()=>{
+    if(!res)return;
+    setTimeout(()=>{
+      if(hInst.current){hInst.current.destroy();}
+      if(cInst.current){cInst.current.destroy();}
+      if(hRef.current){
+        const mn=res.sims[0],mx=res.sims[res.sims.length-1],bins=40,bw=(mx-mn)/bins;
+        const counts=Array(bins).fill(0),labels=Array.from({length:bins},(_,i)=>(mn+i*bw).toFixed(0));
+        res.sims.forEach(v=>{counts[Math.min(bins-1,Math.floor((v-mn)/bw))]++;});
+        hInst.current=new Chart(hRef.current,{type:'bar',
+          data:{labels,datasets:[{data:counts,backgroundColor:labels.map((_,i)=>{const v=mn+i*bw;return v>=res.p95?'#f85149aa':v>=res.mean?'#d2992244':'#58a6ff44';}),borderWidth:0,borderRadius:2}]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+            scales:{x:{ticks:{color:'#4a5f7a',maxTicksLimit:6,font:{size:8}}},y:{ticks:{color:'#4a5f7a',font:{size:8}},grid:{color:'#0f1a2a'}}}}});
+      }
+      if(cRef.current){
+        const step=Math.max(1,Math.floor(res.sims.length/80));
+        const xs=[],ys=[];
+        for(let i=0;i<res.sims.length;i+=step){xs.push(res.sims[i].toFixed(0));ys.push(((i+1)/res.sims.length*100).toFixed(1));}
+        cInst.current=new Chart(cRef.current,{type:'line',
+          data:{labels:xs,datasets:[{data:ys,borderColor:'#00A651',backgroundColor:'rgba(0,166,81,.08)',fill:true,tension:.3,borderWidth:2,pointRadius:0}]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+            scales:{x:{ticks:{color:'#4a5f7a',maxTicksLimit:6,font:{size:8}}},y:{ticks:{color:'#4a5f7a',font:{size:8}},grid:{color:'#0f1a2a'},min:0,max:100}}}});
+      }
+    },80);
+  },[res]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div className="ctrl-row">
+          <div className="ctrl-grp"><div className="ctrl-lbl">Matière</div>
+            <select value={mid} onChange={e=>setMid(e.target.value)}>{MAT.map(m=><option key={m.id} value={m.id}>{m.n}</option>)}</select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">N simulations</div>
+            <select value={n} onChange={e=>setN(+e.target.value)}>
+              <option value={500}>500</option><option value={1000}>1 000</option>
+              <option value={5000}>5 000</option><option value={10000}>10 000</option></select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">CV = {(cv*100).toFixed(0)}%</div>
+            <input type="range" min="0.05" max="0.50" step="0.01" value={cv} onChange={e=>setCv(+e.target.value)}/></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">&nbsp;</div>
+            <button onClick={runSim} disabled={running}
+              style={{background:'var(--P)',color:'#000',border:'none',padding:'5px 14px',borderRadius:'var(--r2)',cursor:'pointer',fontWeight:700,fontSize:'.75rem'}}>
+              {running?<><span className="spin" style={{borderTopColor:'#000'}}/> ...</>:'▶️ Lancer'}</button></div>
+        </div>
+      </div>
+      {!res?(
+        <div style={{textAlign:'center',padding:'40px 0',color:'var(--txt2)'}}>
+          <div style={{fontSize:'2.5rem',marginBottom:8}}>🎲</div>
+          <div style={{fontWeight:600,marginBottom:4}}>Monte Carlo — Méthode Box-Muller</div>
+          <div style={{fontSize:'.75rem'}}>Configurez et cliquez sur Lancer</div>
+        </div>
+      ):(
+        <>
+          <div className="kpi-strip">
+            <div className="kpi"><div className="kpi-lbl">📊 Demande μ</div><div className="kpi-val grn">{(res.mean/1e3).toFixed(1)}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> kT</span></div><div className="kpi-sub">CV: {(res.std/res.mean*100).toFixed(1)}%</div></div>
+            <div className="kpi"><div className="kpi-lbl">📏 Écart-type σ</div><div className="kpi-val bl">{(res.std/1e3).toFixed(2)}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> kT</span></div></div>
+            <div className="kpi"><div className="kpi-lbl">⚠️ VaR P95</div><div className="kpi-val yl">{(res.p95/1e3).toFixed(1)}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> kT</span></div></div>
+            <div className="kpi"><div className="kpi-lbl">🔥 CVaR</div><div className="kpi-val rd">{(res.cvar/1e3).toFixed(1)}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> kT</span></div></div>
+          </div>
+          <div className="g2">
+            <div className="card"><div className="ct">📊 Distribution ({n.toLocaleString()} sims)</div><div className="chart-box md"><canvas ref={hRef}/></div></div>
+            <div className="card"><div className="ct">📈 CDF Cumulative</div><div className="chart-box md"><canvas ref={cRef}/></div></div>
+          </div>
+          <div className="g2">
+            <div className="card"><div className="ct">📦 Impact Q*</div>
+              <div className="mrow"><span className="mk">Q* demande μ</span><span className="mv grn">{res.Qb.toFixed(0)} T</span></div>
+              <div className="mrow"><span className="mk">Q* demande P95</span><span className="mv yl">{res.Qp.toFixed(0)} T</span></div>
+              <div className="mrow"><span className="mk">Différence</span><span className="mv rd">+{(res.Qp-res.Qb).toFixed(0)} T</span></div>
+            </div>
+            <div className="card"><div className="ct">💰 Impact Coûts</div>
+              <div className="mrow"><span className="mk">TC demande μ</span><span className="mv grn">{(res.TCb/1e3).toFixed(1)} k MAD</span></div>
+              <div className="mrow"><span className="mk">TC demande P95</span><span className="mv yl">{(res.TCp/1e3).toFixed(1)} k MAD</span></div>
+              <div className="mrow"><span className="mk">Surcoût</span><span className="mv rd">+{((res.TCp-res.TCb)/1e3).toFixed(1)} k MAD</span></div>
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+/* ════════ ML PAGE ════════ */
+function MLPage(){
+  const [mid,setMid]=useState('M1');
+  const [hor,setHor]=useState(12);
+  const [trend,setTrend]=useState(0.02);
+  const lRef=useRef(null),iRef=useRef(null);
+  const m=MAT.find(x=>x.id===mid),D=m.cj*365;
+  const hist=useMemo(()=>Array.from({length:24},(_,i)=>+(D/12*(1+.15*Math.sin(2*Math.PI*i/12)+trend*i/12+bm()*.05)).toFixed(0)),[mid,trend]);
+  const fc=useMemo(()=>{const last=hist[hist.length-1];return Array.from({length:hor},(_,i)=>+(last*(1+.15*Math.sin(2*Math.PI*(i+24)/12)*.5+trend*(24+i)/12/12+bm()*.03)).toFixed(0));},[hist,hor,trend]);
+
+  useChart(lRef,()=>{
+    const now=new Date();
+    const hL=Array.from({length:24},(_,i)=>{const d=new Date(now.getFullYear(),now.getMonth()-24+i,1);return d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'});});
+    const fL=Array.from({length:hor},(_,i)=>{const d=new Date(now.getFullYear(),now.getMonth()+i,1);return d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'});});
+    return{type:'line',data:{labels:[...hL,...fL],datasets:[
+      {label:'Historique',data:[...hist,...Array(hor).fill(null)],borderColor:'#58a6ff',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3},
+      {label:'Prévision SARIMA+XGB',data:[...Array(24).fill(null),...fc],borderColor:'#00A651',backgroundColor:'rgba(0,166,81,.07)',fill:false,borderWidth:2,pointRadius:3,tension:.3},
+      {label:'IC+',data:[...Array(24).fill(null),...fc.map(v=>v*1.12)],borderColor:'rgba(0,166,81,.25)',backgroundColor:'rgba(0,166,81,.07)',fill:'+1',pointRadius:0,tension:.3},
+      {label:'IC-',data:[...Array(24).fill(null),...fc.map(v=>v*.88)],borderColor:'rgba(0,166,81,.25)',backgroundColor:'transparent',fill:false,pointRadius:0,tension:.3},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9},filter:l=>!l.text.includes('-')}}},
+      scales:{x:{ticks:{color:'#4a5f7a',maxTicksLimit:9,font:{size:9}}},y:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'}}}}};
+  },[mid,hor,trend,hist,fc]);
+
+  useChart(iRef,()=>({type:'bar',
+    data:{labels:['Lag-1','Lag-12','Lag-3','Trend','Seasonality','Price','Inventory','Weather'],
+      datasets:[{data:[28.4,22.1,15.3,12.8,9.6,6.2,3.4,2.2],
+        backgroundColor:['#00A651cc','#58a6ffcc','#d29922cc','#bc8cffcc','#ffa657cc','#3fb950cc','#f85149cc','#58a6ff55'],
+        borderWidth:0,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'}},y:{ticks:{color:'#4a5f7a',font:{size:9}}}}}
+  }),[]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div className="ctrl-row">
+          <div className="ctrl-grp"><div className="ctrl-lbl">Matière</div>
+            <select value={mid} onChange={e=>setMid(e.target.value)}>{MAT.map(m=><option key={m.id} value={m.id}>{m.n}</option>)}</select></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">Horizon = {hor} mois</div>
+            <input type="range" min="3" max="24" value={hor} onChange={e=>setHor(+e.target.value)}/></div>
+          <div className="ctrl-grp"><div className="ctrl-lbl">Tendance = {(trend*100).toFixed(0)}%/an</div>
+            <input type="range" min="-0.10" max="0.15" step="0.01" value={trend} onChange={e=>setTrend(+e.target.value)}/></div>
+        </div>
+      </div>
+      <div className="kpi-strip">
+        <div className="kpi"><div className="kpi-lbl">🎯 MAPE</div><div className="kpi-val grn">4.2<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}>%</span></div><div className="kpi-sub">Test set</div></div>
+        <div className="kpi"><div className="kpi-lbl">📐 R²</div><div className="kpi-val bl">0.92</div><div className="kpi-sub">Coeff. détermination</div></div>
+        <div className="kpi"><div className="kpi-lbl">🔮 Prévision {hor}m</div><div className="kpi-val yl">{(fc.reduce((a,b)=>a+b,0)/1e3).toFixed(1)}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}> kT</span></div></div>
+        <div className="kpi"><div className="kpi-lbl">🤖 Modèle</div><div style={{fontSize:'.72rem',color:'var(--P)',fontWeight:600,marginTop:4}}>SARIMA(1,1,1)(1,1,1)₁₂</div><div style={{fontSize:'.72rem',color:'var(--bl)',fontWeight:600}}>+ XGBoost (60/40)</div></div>
+      </div>
+      <div className="card"><div className="ct">📈 Prévision — {m.short} (24h + {hor}m)</div><div className="chart-box lg"><canvas ref={lRef}/></div></div>
+      <div className="g2">
+        <div className="card"><div className="ct">🔬 Importance Variables</div><div className="chart-box md"><canvas ref={iRef}/></div></div>
+        <div className="card"><div className="ct">📊 Métriques Modèle</div>
+          <div className="mrow"><span className="mk">MAPE train</span><span className="mv grn">3.8%</span></div>
+          <div className="mrow"><span className="mk">MAPE test</span><span className="mv grn">4.2%</span></div>
+          <div className="mrow"><span className="mk">R²</span><span className="mv bl">0.92</span></div>
+          <div className="mrow"><span className="mk">RMSE</span><span className="mv bl">{(D*.043/12).toFixed(0)} T/mois</span></div>
+          <div className="mrow"><span className="mk">Validation</span><span className="mv grn">5-fold TimeSeriesCV</span></div>
+          <div className="mrow"><span className="mk">Saisonnalité</span><span className="mv">Annuelle (12m)</span></div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ RISK PAGE ════════ */
+function RiskPage(){
+  const [risks,setRisks]=useState(FOUR.map(f=>({...f,geo:f.rp*15+10,ops:Math.max(5,100-f.fib),fin:f.rp*8+12,del:+((f.del-20)/30*100).toFixed(0),px:+((Math.abs(f.pb-107))/10*20).toFixed(0)})));
+  const bRef=useRef(null),rRef=useRef(null);
+  const scored=useMemo(()=>risks.map(r=>({...r,total:+riskF(r.geo,r.ops,r.fin,r.del,r.px).toFixed(1)})),[risks]);
+
+  useChart(bRef,()=>({type:'bar',
+    data:{labels:scored.map(f=>f.n),datasets:[
+      {label:'Géo(25%)',data:scored.map(r=>r.geo),backgroundColor:'#f8514944',borderColor:'#f85149',borderWidth:1},
+      {label:'Ops(30%)',data:scored.map(r=>r.ops),backgroundColor:'#d2992244',borderColor:'#d29922',borderWidth:1},
+      {label:'Fin(20%)',data:scored.map(r=>r.fin),backgroundColor:'#bc8cff44',borderColor:'#bc8cff',borderWidth:1},
+      {label:'Délai(15%)',data:scored.map(r=>r.del),backgroundColor:'#58a6ff44',borderColor:'#58a6ff',borderWidth:1},
+      {label:'Prix(10%)',data:scored.map(r=>r.px),backgroundColor:'#ffa65744',borderColor:'#ffa657',borderWidth:1},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9}}}},
+      scales:{x:{stacked:true,ticks:{color:'#4a5f7a',font:{size:9}}},y:{stacked:true,ticks:{color:'#4a5f7a',font:{size:9}},grid:{color:'#0f1a2a'},max:100}}}
+  }),[JSON.stringify(risks)]);
+
+  useChart(rRef,()=>({type:'radar',
+    data:{labels:['Géo','Opérationnel','Financier','Délai','Prix'],
+      datasets:scored.map((f,i)=>({label:f.n,data:[f.geo,f.ops,f.fin,f.del,f.px],
+        borderColor:['#f85149','#d29922','#bc8cff','#58a6ff','#ffa657','#3fb950'][i],
+        backgroundColor:'transparent',borderWidth:1.5,pointRadius:3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:100,ticks:{color:'#4a5f7a',backdropColor:'transparent',font:{size:8}},grid:{color:'#30363d'},pointLabels:{color:'#4a5f7a',font:{size:9}}}},
+      plugins:{legend:{labels:{color:'#4a5f7a',font:{size:9}}}}}
+  }),[JSON.stringify(risks)]);
+
+  return(
+    <>
+      <div className="ctrl">
+        <div style={{marginBottom:7,color:'var(--txt2)',fontSize:'.72rem'}}>Ajustez les scores (0=faible · 100=élevé)</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:9}}>
+          {risks.map(r=>(
+            <div key={r.id} style={{background:'var(--bg2)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:10}}>
+              <div style={{fontWeight:600,marginBottom:6,fontSize:'.75rem'}}>[{r.fl}] {r.n}</div>
+              {[{k:'geo',l:'Géo-politique'},{k:'ops',l:'Opérationnel'},{k:'fin',l:'Financier'},{k:'del',l:'Délai'},{k:'px',l:'Prix'}].map(({k,l})=>(
+                <div key={k} style={{display:'flex',alignItems:'center',gap:5,marginBottom:4}}>
+                  <span style={{fontSize:'.62rem',color:'var(--txt2)',width:72,flexShrink:0}}>{l}</span>
+                  <input type="range" min="0" max="100" value={r[k]} onChange={e=>setRisks(p=>p.map(x=>x.id===r.id?{...x,[k]:+e.target.value}:x))} style={{flex:1,width:'auto'}}/>
+                  <span style={{fontSize:'.65rem',fontWeight:700,minWidth:20,color:r[k]>60?'var(--rd)':r[k]>30?'var(--yl)':'var(--P)'}}>{r[k]}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="kpi-strip">
+        {scored.sort((a,b)=>a.total-b.total).slice(0,4).map(r=>{const cls=clsR(r.total);return(
+          <div key={r.id} className="kpi">
+            <div className="kpi-lbl" style={{display:'flex',justifyContent:'space-between'}}>
+              <span>[{r.fl}] {r.n}</span>
+              <span className={'pill '+(cls==='Faible'?'pill-A':cls==='Modéré'?'pill-C':'pill-D')}>{cls}</span>
+            </div>
+            <div className="kpi-val" style={{color:r.total<30?'var(--P)':r.total<60?'var(--yl)':'var(--rd)'}}>{r.total}<span style={{fontSize:'1rem',color:'var(--txt2)',fontWeight:400}}>/100</span></div>
+            <div className="pbar"><div className="pb-fill" style={{width:r.total+'%',background:r.total<30?'var(--P)':r.total<60?'var(--yl)':'var(--rd)'}}/></div>
+          </div>
+        );})}
+      </div>
+      <div className="g2">
+        <div className="card"><div className="ct">📊 Décomposition du Risque</div><div className="chart-box md"><canvas ref={bRef}/></div></div>
+        <div className="card"><div className="ct">🕸️ Radar des Risques</div><div className="chart-box md"><canvas ref={rRef}/></div></div>
+      </div>
+    </>
+  );
+}
+
+/* ════════ RAPPORT ════════ */
+function RptPage(){
+  const totCost=MAT.reduce((a,m)=>{const D=m.cj*365,S=500,H=m.p*m.v;return a+tc(D,eoq(D,S,H),S,H);},0);
+  const scores=FOUR.map(f=>({...f,s:+scoreF(f).toFixed(1)})).sort((a,b)=>b.s-a.s);
+  return(
+    <>
+      <div className="rpt-section">
+        <h3>📊 Synthèse Exécutive — Optimisation Achats OCP 2025</h3>
+        <div className="g3">
+          <div><div style={{color:'var(--txt2)',fontSize:'.7rem',marginBottom:3}}>Coût total optimisé EOQ</div><div style={{fontSize:'1.4rem',fontWeight:700,color:'var(--P)'}}>{(totCost/1e6).toFixed(2)} M MAD</div></div>
+          <div><div style={{color:'var(--txt2)',fontSize:'.7rem',marginBottom:3}}>Meilleur fournisseur</div><div style={{fontSize:'.95rem',fontWeight:700}}>[{scores[0].fl}] {scores[0].n}</div><div style={{fontSize:'.7rem',color:'var(--txt2)'}}>Score {scores[0].s}/100 — Classe {clsF(scores[0].s)}</div></div>
+          <div><div style={{color:'var(--txt2)',fontSize:'.7rem',marginBottom:3}}>Stratégie recommandée</div><div style={{fontSize:'.95rem',fontWeight:700,color:'var(--yl)'}}>Contrat long terme 3 ans</div><div style={{fontSize:'.7rem',color:'var(--txt2)'}}>Économie –8% prix</div></div>
+        </div>
+      </div>
+      <div className="rpt-section">
+        <h3>📦 Résultats EOQ Wilson par Matière</h3>
+        <table>
+          <thead><tr><th>Matière</th><th>D T/an</th><th>Q* T</th><th>SS T</th><th>ROP T</th><th>TC k MAD</th><th>Cmdes/an</th></tr></thead>
+          <tbody>{MAT.map(m=>{const D=m.cj*365,S=500,H=m.p*m.v,Q=eoq(D,S,H),SS=ss(1.645,m.cj*.15,7),ROP=rop(m.cj,7,SS),TC=tc(D,Q,S,H);return(
+            <tr key={m.id}><td><span style={{color:m.col,fontWeight:700}}>●</span> {m.n}</td><td>{D.toFixed(0)}</td><td style={{fontWeight:700,color:'var(--P)'}}>{Q.toFixed(0)}</td><td>{SS.toFixed(0)}</td><td>{ROP.toFixed(0)}</td><td style={{fontWeight:600}}>{(TC/1e3).toFixed(1)}</td><td>{(D/Q).toFixed(1)}</td></tr>
+          );})}</tbody>
+        </table>
+      </div>
+      <div className="rpt-section">
+        <h3>🏭 Classement Fournisseurs</h3>
+        <table>
+          <thead><tr><th>#</th><th>Fournisseur</th><th>Score</th><th>Cl.</th><th>$/T</th><th>Délai j</th><th>Fiab.%</th><th>ESG</th><th>Risque</th><th>Statut</th></tr></thead>
+          <tbody>{scores.map((f,i)=>{const cls=clsF(f.s);return(
+            <tr key={f.id} style={i<2?{background:'rgba(0,166,81,.04)'}:{}}>
+              <td style={{fontWeight:700}}>{i+1}</td><td style={{fontWeight:600}}>[{f.fl}] {f.n}</td>
+              <td style={{fontWeight:700,color:i===0?'var(--P)':'var(--txt)'}}>{f.s}</td>
+              <td><span className={'pill pill-'+cls}>{cls}</span></td>
+              <td>{f.pb}</td><td>{f.del}</td><td>{f.fib}</td><td>{f.esg}/10</td>
+              <td style={{color:f.rp<=2?'var(--P)':f.rp<=3?'var(--yl)':'var(--rd)'}}>{f.rp}/5</td>
+              <td style={{fontSize:'.7rem',color:'var(--txt2)'}}>{i===0?'Priorité 1':i===1?'Priorité 2':i===2?'Alternatif':'Conditionnel'}</td>
+            </tr>
+          );})}</tbody>
+        </table>
+      </div>
+      <div className="rpt-section">
+        <h3>💡 Recommandations Stratégiques</h3>
+        {[
+          {n:'Contrats long terme ADNOC + Yara',d:'Contrats 3 ans. Capacité combinée 2,17 MT/an. Économie cible –8%.'},
+          {n:'Diversification fournisseurs',d:'Min. 3 fournisseurs par matière critique. Concentration max 40%. CF Industries en backup.'},
+          {n:'EOQ + ajustement Monte Carlo P95',d:'Q* Wilson pour toutes matières. Ajuster P95 (+12%) pour NH3/Fuel. Réduction stockage ~15%.'},
+          {n:'Monitoring ESG géopolitique',d:'Dashboard trimestriel ESG. Réduire exposition UAE/Arabie Saoudite à <60% via Europe.'},
+          {n:'ML en production',d:'SARIMA+XGBoost (MAPE 4.2%, R² 0.92) réentraîné mensuellement. Alertes ±15%.'},
+          {n:'Mitigation risques critiques',d:'Afriquia: limite 10% volumes. Aramco: SLA pénalités (fiab. 85.5%). Stock tampon 30j.'},
+        ].map((r,i)=><div key={i} className="rec-item"><div className="rec-num">{i+1}</div><div className="rec-text"><strong>{r.n}:</strong> {r.d}</div></div>)}
+      </div>
+      <div className="rpt-section">
+        <h3>📅 Roadmap 2025</h3>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
+          {[
+            {q:'T1 2025',col:'var(--P)',items:['Déploiement EOQ','Contrat ADNOC','ML prod.']},
+            {q:'T2 2025',col:'var(--bl)',items:['Contrat Yara 3 ans','Monte Carlo','Audit ESG']},
+            {q:'T3 2025',col:'var(--yl)',items:['Multi-sourcing NH3','Dashboard risque','KPIs SC']},
+            {q:'T4 2025',col:'var(--pu)',items:['Bilan annuel','Renégociation','Roadmap 2026']},
+          ].map(({q,col,items})=>(
+            <div key={q} style={{background:'var(--bg3)',border:`1px solid ${col}44`,borderRadius:'var(--r2)',padding:10}}>
+              <div style={{color:col,fontWeight:700,fontSize:'.75rem',marginBottom:7,borderBottom:`1px solid ${col}33`,paddingBottom:4}}>{q}</div>
+              {items.map((item,j)=><div key={j} style={{fontSize:'.7rem',color:'var(--txt2)',padding:'3px 0',borderBottom:'1px solid #21262d'}}><span style={{color:col,marginRight:3}}>›</span>{item}</div>)}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{textAlign:'center',padding:'12px 0',color:'var(--txt2)',fontSize:'.68rem',borderTop:'var(--bdr)'}}>
+        OCP Group · Procurement Intelligence Platform · {new Date().toLocaleDateString('fr-FR',{year:'numeric',month:'long',day:'numeric'})} · Confidentiel
+      </div>
+    </>
+  );
+}
+
+/* ════════ APP ════════ */
+const PAGES=[Dash,EOQPage,FousPage,ScenPage,MCPage,MLPage,RiskPage,RptPage];
+
+function App(){
+  const [page,setPage]=useState(0);
+  const Page=PAGES[page];
+  return(
+    <>
+      <Sidebar page={page} setPage={setPage}/>
+      <div className="main">
+        <TopBar page={page}/>
+        <div className="content"><Page/></div>
+      </div>
+      <AIAgent/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
