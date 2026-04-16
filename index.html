@@ -11,13 +11,22 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080c12;--bg2:#0e1420;--bg3:#151d2e;--bg4:#1e2a3d;--bg5:#243045;
-  --P:#00c853;--P2:#00e676;--P3:#003d1f;--P4:rgba(0,200,83,.08);
-  --txt:#e2eaf6;--txt2:#7a8fa8;--txt3:#4a5f7a;
-  --rd:#ff4757;--yl:#ffa502;--bl:#2979ff;--pu:#9c27b0;--cy:#00bcd4;
-  --bdr:1px solid #1a2640;--bdr2:1px solid #243050;--r:12px;--r2:8px;--r3:4px;
-  --shadow:0 8px 32px rgba(0,0,0,.6);
-  --grd:linear-gradient(135deg,#00c853,#00bcd4);
+  /* Fonds - Gris doux (plus confortable que blanc pur) */
+  --bg:#e7eaec;--bg2:#FFFFFF;--bg3:#EBF0F5;--bg4:#E1E8EF;--bg5:#D4DCE5;
+  
+  /* Vert OCP */
+  --P:#272354;--P2:#dbe4d5;--P3:#EFF8E8;--P4:rgba(15, 191, 47, 0.1);
+  
+  /* Textes */
+  --txt:#034f22;--txt2:#2b3951;--txt3:#122540;
+  
+  /* Couleurs d'état */
+  --rd:#E53E3E;--yl:#DD6B20;--bl:#3182CE;--pu:#805AD5;--cy:#0BC5EA;
+  
+  /* Bordures */
+  --bdr:1px solid #E2E8F0;--bdr2:1px solid #CBD5E0;--r:12px;--r2:8px;--r3:4px;
+  --shadow:0 4px 16px rgba(0,0,0,.08);
+  --grd:linear-gradient(135deg,#7AC143,#6CB33F);
 }
 html{height:100%}
 body{
@@ -32,10 +41,14 @@ body{
 
 /* ═══════════════ SIDEBAR ═══════════════ */
 .sb{width:252px;min-width:252px;background:var(--bg2);border-right:var(--bdr);display:flex;flex-direction:column;min-height:100vh;max-height:100vh;overflow:hidden;position:sticky;top:0}
-.sb-logo{padding:0 16px 16px;background:linear-gradient(160deg,#0a1628 0%,#0e1c32 100%);border-bottom:var(--bdr);flex-shrink:0}
-.sb-logo-head{display:flex;align-items:center;gap:10px;padding-top:16px;padding-bottom:10px}
-.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--P),#00bcd4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 4px 14px rgba(0,200,83,.35)}
-.sb-logo h1{font-size:.9rem;color:var(--txt);font-weight:800;letter-spacing:1.5px;line-height:1.2}
+.sb-logo{padding:25px 16px 16px;background:linear-gradient(160deg,#069924 0%,#069924 100%);border-bottom:var(--bdr);flex-shrink:0}
+.sb-logo-head{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:15px;}
+.sb-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:left;}
+.sb-logo-icon{
+  width:30px;
+  height:auto;
+  filter: brightness(0) invert(1);
+}.sb-logo h1{font-size:.9rem;color:var(--txt);font-weight:800;letter-spacing:1.5px;line-height:1.2}
 .sb-logo h1 span{color:var(--P)}
 .sb-logo p{font-size:.58rem;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;padding-left:46px;margin-top:-2px}
 .sb-status{display:flex;align-items:center;gap:6px;padding:5px 0 0}
@@ -50,7 +63,7 @@ body{
 .ni-ico{font-size:.85rem;width:18px;text-align:center;flex-shrink:0}
 
 /* ═══════════════ SIDEBAR KPI PANEL ═══════════════ */
-.sb-kpis{border-top:var(--bdr);padding:12px 14px;background:linear-gradient(160deg,#080d1a,#0b1220);flex-shrink:0}
+.sb-kpis{border-top:var(--bdr);padding:12px 14px;background:linear-gradient(160deg,#069924,#069924);flex-shrink:0}
 .sb-kpis-title{font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .sb-kpis-title::before{content:'';flex:1;height:1px;background:var(--bdr)}
 .sb-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -74,7 +87,7 @@ body{
 }
 
 /* ═══════════════ TOPBAR ═══════════════ */
-.topbar{height:52px;min-height:52px;background:linear-gradient(90deg,#0b1424,#0e1828);border-bottom:var(--bdr);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:relative}
+.topbar{height:52px;min-height:52px;background:linear-gradient(90deg,#069924,#092912);border-bottom:var(--bdr);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:relative}
 .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--P),transparent);opacity:.3}
 .topbar-left{display:flex;align-items:center;gap:10px}
 .topbar-ico{width:34px;height:34px;background:var(--P4);border:1px solid rgba(0,200,83,.2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:1rem}
@@ -148,8 +161,8 @@ input[type=range]{padding:4px 0;accent-color:var(--P);width:130px;cursor:pointer
 .pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.62rem;font-weight:700}
 .pill-A{background:rgba(0,200,83,.12);color:#39d96a;border:1px solid rgba(0,200,83,.2)}
 .pill-B{background:rgba(0,200,83,.07);color:#7ee23a;border:1px solid rgba(0,200,83,.15)}
-.pill-C{background:rgba(255,165,2,.1);color:#ffa502;border:1px solid rgba(255,165,2,.2)}
-.pill-D{background:rgba(255,71,87,.1);color:#ff4757;border:1px solid rgba(255,71,87,.2)}
+.pill-C{background:rgba(255,165,2,.1);color:#b57705;border:1px solid rgba(255,165,2,.2)}
+.pill-D{background:rgba(255,71,87,.1);color:#ae212d;border:1px solid rgba(255,71,87,.2)}
 .mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #0f1a2a}
 .mrow:last-child{border-bottom:none}
 .mk{color:var(--txt3);font-size:.73rem}.mv{font-size:.73rem;font-weight:600}
@@ -233,10 +246,10 @@ const FOUR=[
   {id:'F6',n:'CF Industries',pays:'USA',fl:'US',pb:107,del:41,fib:93.7,esg:8.8,rp:2,cap:395196},
 ];
 const PHASES=[
-  {id:0,ico:'📊',lbl:'Dashboard'},{id:1,ico:'📦',lbl:'EOQ Wilson'},
-  {id:2,ico:'🏭',lbl:'Fournisseurs'},{id:3,ico:'🎯',lbl:'Scénarios'},
-  {id:4,ico:'🎲',lbl:'Monte Carlo'},{id:5,ico:'🤖',lbl:'Prévisions ML'},
-  {id:6,ico:'⚠️',lbl:'Gestion Risques'},{id:7,ico:'📋',lbl:'Rapport'},
+  {id:0,ico:'',lbl:'Dashboard'},{id:1,ico:'',lbl:'EOQ Wilson'},
+  {id:2,ico:'',lbl:'Fournisseurs'},{id:3,ico:'',lbl:'Scénarios'},
+  {id:4,ico:'',lbl:'Monte Carlo'},{id:5,ico:'',lbl:'Prévisions ML'},
+  {id:6,ico:'',lbl:'Gestion Risques'},{id:7,ico:'',lbl:'Rapport'},
 ];
 
 /* FORMULAS */
@@ -398,7 +411,7 @@ function isOCPQuery(q){
 
 function formatSearchResults(results,src){
   if(!results||results.length===0)return`Aucun résultat trouvé pour cette recherche.`;
-  const ico=src==='google'?'🔍':src==='wiki'?'📖':'🦆';
+  const ico=src==='google'?'':src==='wiki'?'':'';
   let txt=`${ico} **Résultats ${src==='google'?'Google':src==='wiki'?'Wikipedia':'DuckDuckGo'}:**\n\n`;
   results.slice(0,4).forEach((r,i)=>{
     txt+=`**${i+1}. ${r.title}**\n${r.snippet?r.snippet.slice(0,200)+'...':''}\n${r.link?`🔗 ${r.link.slice(0,60)}...`:''}\n\n`;
@@ -524,7 +537,7 @@ function AIAgent(){
 
         // 2. Wikipedia (for definition/explanation queries)
         if(!webCtx&&(ql.includes('qu\'est')||ql.includes('c\'est quoi')||ql.includes('définition')||ql.includes('explique'))){
-          setTypingLabel(useGemini?'📖 Wikipedia → ✨ Gemini...':'Recherche Wikipedia...');
+          setTypingLabel(useGemini?' Wikipedia →  Gemini...':'Recherche Wikipedia...');
           try{
             const wikiQ=q.replace(/qu'est[- ]ce que|c'est quoi|définition de|explique moi/gi,'').trim();
             const wiki=await searchWiki(wikiQ||q);
@@ -533,7 +546,7 @@ function AIAgent(){
                 webCtx=`Wikipedia - ${wiki.title}: ${wiki.extract}`;
                 webSrc='wiki';
               } else {
-                setMsgs(p=>[...p,{role:'ai',text:`📖 **Wikipedia — ${wiki.title}**\n\n${wiki.extract}\n\n🔗 ${wiki.link}`,src:'wiki'}]);
+                setMsgs(p=>[...p,{role:'ai',text:` **Wikipedia — ${wiki.title}**\n\n${wiki.extract}\n\n🔗 ${wiki.link}`,src:'wiki'}]);
                 setTyping(false);setTypingLabel('En train de répondre...');return;
               }
             }
@@ -542,7 +555,7 @@ function AIAgent(){
 
         // 3. DuckDuckGo fallback
         if(!webCtx){
-          setTypingLabel(useGemini?'🦆 DuckDuckGo → ✨ Gemini...':'Recherche DuckDuckGo...');
+          setTypingLabel(useGemini?' DuckDuckGo →  Gemini...':'Recherche DuckDuckGo...');
           try{
             const ddgR=await searchDDG(q);
             if(ddgR.length>0){
@@ -560,7 +573,7 @@ function AIAgent(){
         // 4. No web results, no Gemini → local fallback
         if(!useGemini){
           await new Promise(r=>setTimeout(r,300));
-          setMsgs(p=>[...p,{role:'ai',text:`⚠️ Recherche web indisponible.\n\n`+aiReply(q)}]);
+          setMsgs(p=>[...p,{role:'ai',text:` Recherche web indisponible.\n\n`+aiReply(q)}]);
           setTyping(false);setTypingLabel('En train de répondre...');return;
         }
 
@@ -591,7 +604,7 @@ function AIAgent(){
         }catch(e){
           // Gemini failed → fallback to raw results or local
           if(webCtx&&webSrc&&webSrc!=='local'){
-            setMsgs(p=>[...p,{role:'ai',text:`⚠️ Gemini indisponible (${e.message}).\n\n`+aiReply(q)}]);
+            setMsgs(p=>[...p,{role:'ai',text:` Gemini indisponible (${e.message}).\n\n`+aiReply(q)}]);
           } else {
             setMsgs(p=>[...p,{role:'ai',text:aiReply(q)}]);
           }
@@ -602,7 +615,7 @@ function AIAgent(){
       // Ultimate fallback
       setMsgs(p=>[...p,{role:'ai',text:aiReply(q)}]);
     }catch(e){
-      setMsgs(p=>[...p,{role:'ai',text:`❌ Erreur: ${e.message}\n\nRéponse locale:\n`+aiReply(q)}]);
+      setMsgs(p=>[...p,{role:'ai',text:` Erreur: ${e.message}\n\nRéponse locale:\n`+aiReply(q)}]);
     }
     setTyping(false);
     setTypingLabel('En train de répondre...');
@@ -613,16 +626,19 @@ function AIAgent(){
 
   return(
     <>
-      <button className="ai-fab" onClick={()=>setOpen(o=>!o)} title={hasGemini?'OCP AI — Gemini IA actif':'OCP AI + Web Search'}
-        style={{background:hasGemini?'linear-gradient(135deg,#4285f4,#00A651)':'linear-gradient(135deg,#00A651,#00c46a)'}}>
-        {open?'✕':hasGemini?'✨':'🤖'}
-        {notif&&!open&&<div className="ai-notif">!</div>}
-      </button>
+     <button className="ai-fab" onClick={()=>setOpen(o=>!o)} 
+  title={hasGemini?'OCP AI — Gemini IA actif':'OCP AI + Web Search'}
+  style={{background:hasGemini?'linear-gradient(135deg,#4285f4,#00A651)':'linear-gradient(135deg,#00A651,#00c46a)'}}>
+
+  {open ? '✕' : <img src="chatbot.png" style={{width:"28px",height:"28px"}} />}
+
+  {notif && !open && <div className="ai-notif">!</div>}
+</button>
       {open&&(
         <div className="ai-panel">
           {/* HEADER */}
           <div className="ai-head">
-            <div className="ai-avi">🤖</div>
+            <div className="ai-avi"></div>
             <div className="ai-info">
               <h4>OCP Procurement AI</h4>
               <p><span className="ai-dot"/>&nbsp;{hasGemini?'✨ Gemini AI actif'+(hasGoogle?' + 🔍':''):hasGoogle?'🔍 Google connecté':'🦆 DDG + Wiki actifs'}</p>
@@ -677,16 +693,16 @@ function AIAgent(){
                   </div>
                   <button onClick={saveKeys}
                     style={{background:keySaved?'#1a3a20':'var(--P)',color:keySaved?'var(--P)':'#000',border:keySaved?'1px solid var(--P)':'none',padding:'6px',borderRadius:'var(--r2)',cursor:'pointer',fontWeight:700,fontSize:'.75rem',transition:'all .3s'}}>
-                    {keySaved?'✅ Sauvegardé!':'💾 Sauvegarder les clés'}
+                    {keySaved?' Sauvegardé!':' Sauvegarder les clés'}
                   </button>
                 </div>
               </div>
 
               <div style={{background:'var(--bg3)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:12,marginBottom:12}}>
                 <div style={{fontSize:'.72rem',color:'var(--bl)',fontWeight:600,marginBottom:8}}>🔀 Mode de Recherche</div>
-                {[{v:'auto',l:'🤖 Auto (détecte la meilleure source)',d:'OCP → local · Général → web'},
-                  {v:'web',l:'🌐 Web uniquement',d:'Toujours chercher sur internet'},
-                  {v:'local',l:'📊 Local uniquement',d:'Données OCP seulement'},
+                {[{v:'auto',l:' Auto (détecte la meilleure source)',d:'OCP → local · Général → web'},
+                  {v:'web',l:' Web uniquement',d:'Toujours chercher sur internet'},
+                  {v:'local',l:' Local uniquement',d:'Données OCP seulement'},
                 ].map(({v,l,d})=>(
                   <div key={v} onClick={()=>setSearchMode(v)}
                     style={{display:'flex',alignItems:'center',gap:8,padding:'7px 8px',borderRadius:'var(--r2)',cursor:'pointer',marginBottom:4,
@@ -701,11 +717,11 @@ function AIAgent(){
               <div style={{background:'var(--bg3)',border:'var(--bdr)',borderRadius:'var(--r2)',padding:10}}>
                 <div style={{fontSize:'.72rem',color:'var(--P)',fontWeight:600,marginBottom:6}}>✅ Sources disponibles</div>
                 {[
-                  {n:'✨ Gemini AI',s:hasGemini,d:'1 500 req/jour · Intelligence artificielle'},
-                  {n:'🔍 Google Search',s:hasGoogle,d:'100 req/jour · Résultats web temps réel'},
-                  {n:'🦆 DuckDuckGo',s:true,d:'Gratuit sans clé'},
-                  {n:'📖 Wikipedia (FR)',s:true,d:'Encyclopédie gratuite'},
-                  {n:'📊 Données OCP locales',s:true,d:'7 matières · 6 fournisseurs'},
+                  {n:' Gemini AI',s:hasGemini,d:'1 500 req/jour · Intelligence artificielle'},
+                  {n:' Google Search',s:hasGoogle,d:'100 req/jour · Résultats web temps réel'},
+                  {n:' DuckDuckGo',s:true,d:'Gratuit sans clé'},
+                  {n:' Wikipedia (FR)',s:true,d:'Encyclopédie gratuite'},
+                  {n:' Données OCP locales',s:true,d:'7 matières · 6 fournisseurs'},
                 ].map(({n,s,d})=>(
                   <div key={n} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'4px 0',borderBottom:'1px solid #21262d'}}>
                     <div><div style={{fontSize:'.72rem'}}>{n}</div><div style={{fontSize:'.62rem',color:'var(--txt2)'}}>{d}</div></div>
@@ -727,7 +743,7 @@ function AIAgent(){
               {/* Search mode badge */}
               <div style={{padding:'4px 12px',background:'var(--bg)',borderBottom:'var(--bdr)',display:'flex',gap:6,alignItems:'center',flexShrink:0}}>
                 <span style={{fontSize:'.62rem',color:'var(--txt2)'}}>Mode:</span>
-                {[{v:'auto',l:'🤖 Auto'},{v:'web',l:'🌐 Web'},{v:'local',l:'📊 Local'}].map(({v,l})=>(
+                {[{v:'auto',l:' Auto'},{v:'web',l:' Web'},{v:'local',l:' Local'}].map(({v,l})=>(
                   <button key={v} onClick={()=>setSearchMode(v)}
                     style={{background:searchMode===v?'var(--P3)':'transparent',color:searchMode===v?'var(--P)':'var(--txt2)',border:searchMode===v?'1px solid var(--P)':'1px solid transparent',padding:'2px 7px',borderRadius:10,cursor:'pointer',fontSize:'.62rem',fontWeight:searchMode===v?600:400}}>
                     {l}
@@ -742,7 +758,7 @@ function AIAgent(){
                   <div key={i} className={`ai-msg ${m.role}`}>
                     <div className="ai-av" style={m.src&&m.src.includes('gemini')?{background:'rgba(66,133,244,.15)',color:'#4285f4'}:{}}>
                       {m.role==='ai'?(
-                        m.src==='google'?'🔍':m.src==='wiki'?'📖':m.src==='ddg'?'🦆':
+                        m.src==='google'?'🔍':m.src==='wiki'?'':m.src==='ddg'?'🦆':
                         m.src&&m.src.includes('gemini')?'✨':'🤖'
                       ):'👤'}
                     </div>
@@ -797,9 +813,8 @@ function Sidebar({page,setPage}){
       {/* LOGO */}
       <div className="sb-logo">
         <div className="sb-logo-head">
-          <div className="sb-logo-icon">⬡</div>
-          <div>
-            <h1>OCP <span>INTEL</span></h1>
+         <img src="file:///C:/Users/ZBook/Desktop/ssis_ocp/logo.png" className="sb-logo-icon" />          <div>
+
           </div>
         </div>
         <div style={{fontSize:'.58rem',color:'var(--txt3)',letterSpacing:'.5px',textTransform:'uppercase',paddingLeft:46,marginTop:-2}}>Procurement Intelligence Platform</div>
@@ -1087,7 +1102,7 @@ function FousPage(){
         <div className="ctrl-row">
           {[{k:'px',l:'Prix 💲'},{k:'dl',l:'Délai ⏱'},{k:'fb',l:'Fiabilité ✅'},{k:'es',l:'ESG 🌱'},{k:'rp',l:'Risque 🌍'}].map(({k,l})=>(
             <div key={k} className="ctrl-grp">
-              <div className="ctrl-lbl">{l} ({wx[k]}%)</div>
+            <div className="ctrl-lbl">{l} ({wx[k]}%)</div>
               <input type="range" min="0" max="60" step="5" value={wx[k]} onChange={e=>setWx(p=>({...p,[k]:+e.target.value}))}/>
             </div>
           ))}
