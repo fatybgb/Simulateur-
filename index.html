@@ -1102,7 +1102,7 @@ function FousPage(){
         <div className="ctrl-row">
           {[{k:'px',l:'Prix 💲'},{k:'dl',l:'Délai ⏱'},{k:'fb',l:'Fiabilité ✅'},{k:'es',l:'ESG 🌱'},{k:'rp',l:'Risque 🌍'}].map(({k,l})=>(
             <div key={k} className="ctrl-grp">
-            <div className="ctrl-lbl">{l} ({wx[k]}%)</div>
+              <div className="ctrl-lbl">{l} ({wx[k]}%)</div>
               <input type="range" min="0" max="60" step="5" value={wx[k]} onChange={e=>setWx(p=>({...p,[k]:+e.target.value}))}/>
             </div>
           ))}
@@ -1558,4 +1558,4 @@ function App(){
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
-</html>
+</html>p">
